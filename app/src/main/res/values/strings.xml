@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">CTI-CART</string>
+
+    <!-- ADD THIS -->
+    <string name="default_web_client_id">
+        682022383271-7nteqn6jlr9cqpk5mkrdvp4bleosbve8.apps.googleusercontent.com
+    </string>
+</resources>
