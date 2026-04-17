@@ -20,7 +20,7 @@ import com.google.android.gms.auth.api.signin.*
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.*
 import androidx.compose.ui.res.stringResource
-
+// Test change for feature branch
 @Composable
 fun LoginScreen(navController: NavController) {
 
