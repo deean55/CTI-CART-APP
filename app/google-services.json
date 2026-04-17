@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "682022383271",
+    "project_id": "cti-cart",
+    "storage_bucket": "cti-cart.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:682022383271:android:acdf0d8939b3cc6f09b582",
+        "android_client_info": {
+          "package_name": "com.example.cti_cart"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "682022383271-80c8gdv02kpuqeg32ljvtp99tirjecbp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cti_cart",
+            "certificate_hash": "044fd84781bdd072af7991198631fb6562fb31fd"
+          }
+        },
+        {
+          "client_id": "682022383271-7nteqn6jlr9cqpk5mkrdvp4bleosbve8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFgOZwp9dM2n-tUWP9r_VRoaODYkkQA6c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "682022383271-7nteqn6jlr9cqpk5mkrdvp4bleosbve8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
