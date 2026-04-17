@@ -47,7 +47,7 @@ object FirebaseRepository {
 
         ref.putFile(uri)
             .continueWithTask { task ->
-                if (!task.isSuccessful) throw task.exception!!
+                if (!task.isSuccessful) throw task.exception ?: Exception("Upload failed")
                 ref.downloadUrl
             }
             .addOnSuccessListener { downloadUrl ->
@@ -76,9 +76,7 @@ object FirebaseRepository {
         firestore.collection("users")
             .document(userId)
             .set(data)
-            .addOnSuccessListener {
-                onSuccess()
-            }
+            .addOnSuccessListener { onSuccess() }
             .addOnFailureListener {
                 it.printStackTrace()
                 onFailure(it)
@@ -107,13 +105,47 @@ object FirebaseRepository {
 
         firestore.collection("machines")
             .add(machineData)
-            .addOnSuccessListener {
+            .addOnSuccessListener { doc ->
+                // 🔥 Add document ID inside document
+                doc.update("id", doc.id)
                 onSuccess()
             }
             .addOnFailureListener {
                 it.printStackTrace()
                 onFailure(it)
             }
+    }
+
+    // -------------------- COMBINED UPLOAD --------------------
+
+    fun uploadMachineWithImage(
+        name: String,
+        rate: String,
+        utilization: String,
+        imageUri: Uri,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        uploadImage(
+            uri = imageUri,
+            onSuccess = { imageUrl ->
+
+                val data = mapOf(
+                    "name" to name,
+                    "hourlyRate" to rate,
+                    "utilization" to utilization,
+                    "imageUrl" to imageUrl,
+                    "images" to listOf(imageUrl) // future support
+                )
+
+                addMachine(
+                    data = data,
+                    onSuccess = onSuccess,
+                    onFailure = onFailure
+                )
+            },
+            onFailure = onFailure
+        )
     }
 
     // -------------------- GET ALL MACHINES --------------------
@@ -154,10 +186,11 @@ object FirebaseRepository {
             }
     }
 
-    // -------------------- DELETE MACHINE --------------------
+    // -------------------- DELETE MACHINE + IMAGE --------------------
 
     fun deleteMachine(
         documentId: String,
+        imageUrl: String?,
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
@@ -165,6 +198,17 @@ object FirebaseRepository {
             .document(documentId)
             .delete()
             .addOnSuccessListener {
+
+                // 🔥 Delete image also (if exists)
+                if (!imageUrl.isNullOrEmpty()) {
+                    try {
+                        val ref = storage.getReferenceFromUrl(imageUrl)
+                        ref.delete()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
                 onSuccess()
             }
             .addOnFailureListener {
