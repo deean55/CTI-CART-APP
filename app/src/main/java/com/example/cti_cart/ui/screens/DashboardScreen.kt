@@ -6,7 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -67,10 +67,13 @@ fun DashboardHeader(
 
 @Composable
 fun SupplierDashboardScreen(navController: NavController) {
+
+    var showHistory by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .statusBarsPadding() // ADD THIS
+            .statusBarsPadding()
             .padding(16.dp)
     ) {
 
@@ -93,29 +96,47 @@ fun SupplierDashboardScreen(navController: NavController) {
             DashboardCard(
                 title = "Add Details",
                 icon = Icons.Default.Edit,
-                color = Color(0xFF1976D2) // 🔵 Blue
+                color = Color(0xFF1976D2)
             ) {
                 navController.navigate("add_details")
             }
 
             DashboardCard(
                 title = "Add Machine",
-                icon = Icons.Default.Build, // ✅ FIX
-                color = Color(0xFF388E3C) // 🔵 Blue
+                icon = Icons.Default.Build,
+                color = Color(0xFF388E3C)
             ) {
                 navController.navigate("add_machine")
             }
 
             DashboardCard(
-                title = "History",
-                icon = Icons.Default.History, // ✅ FIX
-                color = Color(0xFFF57C00) // 🟠 Orange
+                title = if (showHistory) "History ▲" else "History ▼",
+                icon = Icons.Default.History,
+                color = Color(0xFFF57C00)
             ) {
-                navController.navigate("history")
+                showHistory = !showHistory
             }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // -------- INLINE MACHINE LIST --------
+
+        if (showHistory) {
+
+            Text(
+                text = "Machine History",
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            MachineListSection()
         }
     }
 }
+
+// -------------------- DASHBOARD CARD --------------------
 
 @Composable
 fun DashboardCard(
@@ -141,7 +162,7 @@ fun DashboardCard(
             Icon(
                 imageVector = icon,
                 contentDescription = title,
-                tint = Color.White, // ✅ FIXED
+                tint = Color.White,
                 modifier = Modifier.size(32.dp)
             )
 
