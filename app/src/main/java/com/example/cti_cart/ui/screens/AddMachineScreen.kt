@@ -1,7 +1,6 @@
 package com.example.cti_cart.ui.screens
 
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -22,20 +21,49 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.cti_cart.data.FirebaseRepository
 import androidx.compose.ui.text.input.KeyboardType
-import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun AddMachineScreen(navController: NavController) {
+fun AddMachineScreen(
+    navController: NavController,
+    machineId: String? = null // 🔥 NULL = ADD | NOT NULL = EDIT
+) {
 
     val context = LocalContext.current
-
-    // ---------------- STATE ----------------
 
     var machineName by remember { mutableStateOf("") }
     var hourlyRate by remember { mutableStateOf("") }
     var utilization by remember { mutableStateOf("") }
+
     var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var existingImageUrl by remember { mutableStateOf<String?>(null) }
+
     var isLoading by remember { mutableStateOf(false) }
+    var isEditMode = machineId != null
+
+    // ---------------- LOAD DATA FOR EDIT ----------------
+
+    LaunchedEffect(machineId) {
+        if (machineId != null) {
+            isLoading = true
+
+            FirebaseRepository.firestore
+                .collection("machines")
+                .document(machineId)
+                .get()
+                .addOnSuccessListener {
+
+                    machineName = it.getString("name") ?: ""
+                    hourlyRate = it.getString("hourlyRate") ?: ""
+                    utilization = it.getString("utilization") ?: ""
+
+                    existingImageUrl =
+                        it.getString("imageUrl")
+                            ?: (it.get("images") as? List<*>)?.firstOrNull() as? String
+
+                    isLoading = false
+                }
+        }
+    }
 
     // ---------------- IMAGE PICKER ----------------
 
@@ -50,66 +78,50 @@ fun AddMachineScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .statusBarsPadding()
-            .padding(horizontal = 20.dp) // FIXED top padding issue
+            .padding(16.dp)
     ) {
 
-        Spacer(modifier = Modifier.height(12.dp)) // controlled spacing
-
-        // -------- TITLE --------
         Text(
-            text = "Add Machine",
+            text = if (isEditMode) "Edit Machine" else "Add Machine",
             style = MaterialTheme.typography.titleLarge
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // -------- INPUTS --------
-
         OutlinedTextField(
             value = machineName,
             onValueChange = { machineName = it },
             label = { Text("Machine Name") },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp)
+            modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         OutlinedTextField(
             value = hourlyRate,
             onValueChange = { hourlyRate = it },
             label = { Text("Hourly Rate") },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number
-            ),
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         OutlinedTextField(
             value = utilization,
             onValueChange = { utilization = it },
-            label = { Text("Utilization in %") },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number
-            ),
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp)
+            label = { Text("Utilization %") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         // -------- IMAGE BUTTON --------
 
         Button(
             onClick = { launcher.launch("image/*") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
-            shape = RoundedCornerShape(50)
+            modifier = Modifier.fillMaxWidth()
         ) {
             Icon(Icons.Default.Upload, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
@@ -120,84 +132,134 @@ fun AddMachineScreen(navController: NavController) {
 
         // -------- IMAGE PREVIEW --------
 
-        imageUri?.let {
-            Image(
-                painter = rememberAsyncImagePainter(it),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-                    .clip(RoundedCornerShape(12.dp))
-            )
+        when {
+            imageUri != null -> {
+                Image(
+                    painter = rememberAsyncImagePainter(imageUri),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                )
+            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            existingImageUrl != null -> {
+                Image(
+                    painter = rememberAsyncImagePainter(existingImageUrl),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                )
+            }
         }
 
-        Spacer(modifier = Modifier.weight(1f)) // pushes button to bottom
+        Spacer(modifier = Modifier.height(24.dp))
 
         // -------- SUBMIT BUTTON --------
 
         Button(
             onClick = {
-                // Check if USer id logged.
-                Log.d("AUTH", FirebaseAuth.getInstance().currentUser?.uid ?: "NULL USER")
-                // -------- VALIDATION --------
 
                 if (machineName.isBlank() || hourlyRate.isBlank() || utilization.isBlank()) {
                     Toast.makeText(context, "Fill all fields", Toast.LENGTH_SHORT).show()
                     return@Button
                 }
 
-                if (imageUri == null) {
-                    Toast.makeText(context, "Select an image", Toast.LENGTH_SHORT).show()
-                    return@Button
-                }
-
                 isLoading = true
 
-                // -------- FIREBASE CALL --------
+                // 🔥 EDIT MODE
+                if (isEditMode) {
 
-                FirebaseRepository.uploadMachineWithImage(
-                    name = machineName.trim(),
-                    rate = hourlyRate.trim(),
-                    utilization = utilization.trim(),
-                    imageUri = imageUri!!,
+                    if (imageUri != null) {
+                        // New image → upload first
+                        FirebaseRepository.uploadImage(
+                            uri = imageUri!!,
+                            onSuccess = { newUrl ->
 
-                    onSuccess = {
-                        isLoading = false
-
-                        Toast.makeText(context, "Machine Added", Toast.LENGTH_SHORT).show()
-
-                        // RESET FORM
-                        machineName = ""
-                        hourlyRate = ""
-                        utilization = ""
-                        imageUri = null
-                    },
-
-                    onFailure = {
-                        isLoading = false
-                        Toast.makeText(context, "Error: ${it.message}", Toast.LENGTH_LONG).show()
+                                updateMachine(machineId!!, machineName, hourlyRate, utilization, newUrl, context) {
+                                    isLoading = false
+                                    navController.popBackStack()
+                                }
+                            },
+                            onFailure = {
+                                isLoading = false
+                            }
+                        )
+                    } else {
+                        // No new image → keep old
+                        updateMachine(machineId!!, machineName, hourlyRate, utilization, existingImageUrl, context) {
+                            isLoading = false
+                            navController.popBackStack()
+                        }
                     }
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(54.dp),
-            enabled = !isLoading,
-            shape = RoundedCornerShape(50)
-        ) {
 
+                } else {
+                    // 🔥 ADD MODE
+                    if (imageUri == null) {
+                        Toast.makeText(context, "Select an image", Toast.LENGTH_SHORT).show()
+                        isLoading = false
+                        return@Button
+                    }
+
+                    FirebaseRepository.uploadMachineWithImage(
+                        name = machineName,
+                        rate = hourlyRate,
+                        utilization = utilization,
+                        imageUri = imageUri!!,
+                        onSuccess = {
+                            isLoading = false
+                            Toast.makeText(context, "Machine Added", Toast.LENGTH_SHORT).show()
+                            navController.popBackStack()
+                        },
+                        onFailure = {
+                            isLoading = false
+                        }
+                    )
+                }
+            },
+            enabled = !isLoading,
+            modifier = Modifier.fillMaxWidth()
+        ) {
             if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(22.dp),
-                    strokeWidth = 2.dp
-                )
+                CircularProgressIndicator(modifier = Modifier.size(20.dp))
             } else {
-                   Text("SUBMIT")
+                Text(if (isEditMode) "UPDATE" else "SUBMIT")
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
     }
+}
+
+// ---------------- UPDATE FUNCTION ----------------
+
+fun updateMachine(
+    machineId: String,
+    name: String,
+    rate: String,
+    utilization: String,
+    imageUrl: String?,
+    context: android.content.Context,
+    onDone: () -> Unit
+) {
+    val data = mutableMapOf<String, Any>(
+        "name" to name,
+        "hourlyRate" to rate,
+        "utilization" to utilization
+    )
+
+    imageUrl?.let {
+        data["imageUrl"] = it
+        data["images"] = listOf(it)
+    }
+
+    FirebaseRepository.firestore
+        .collection("machines")
+        .document(machineId)
+        .update(data)
+        .addOnSuccessListener {
+            Toast.makeText(context, "Updated", Toast.LENGTH_SHORT).show()
+            onDone()
+        }
 }

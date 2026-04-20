@@ -131,7 +131,7 @@ fun SupplierDashboardScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            MachineListSection()
+            MachineListSection(navController)
         }
     }
 }

@@ -62,9 +62,20 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("buyer_dashboard") {
                     BuyerDashboardScreen(navController)}
+                // -------- ADD MACHINE --------
                 composable("add_machine") {
-                        AddMachineScreen(navController)
-                    }
+                    AddMachineScreen(navController)
+                }
+                // -------- EDIT MACHINE (IMPORTANT) --------
+                composable("add_machine/{machineId}") { backStackEntry ->
+
+                    val machineId = backStackEntry.arguments?.getString("machineId")
+
+                    AddMachineScreen(
+                        navController = navController,
+                        machineId = machineId
+                    )
+                }
                 composable("post_rfq") {
                     PostRFQScreen(navController)
                 }

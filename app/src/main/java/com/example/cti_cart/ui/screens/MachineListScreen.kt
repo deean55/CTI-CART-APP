@@ -1,22 +1,26 @@
 package com.example.cti_cart.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.cti_cart.data.FirebaseRepository
 import androidx.compose.ui.Alignment
-import android.widget.Toast
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavController
+
+// -------------------- MACHINE LIST SECTION --------------------
 
 @Composable
-fun MachineListSection() {
+fun MachineListSection(navController: NavController) {
 
     var machines by remember { mutableStateOf<List<Map<String, Any>>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
@@ -53,9 +57,12 @@ fun MachineListSection() {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
                 machines.forEach { machine ->
+
                     MachineRow(
                         machine = machine,
+                        navController = navController,
                         onDelete = {
+
                             val id = machine["id"] as? String ?: return@MachineRow
 
                             val imageUrl = when {
@@ -69,7 +76,7 @@ fun MachineListSection() {
                                 imageUrl = imageUrl,
                                 onSuccess = {
                                     Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
-                                    loadMachines() // 🔥 refresh
+                                    loadMachines()
                                 },
                                 onFailure = {
                                     Toast.makeText(context, "Error: ${it.message}", Toast.LENGTH_SHORT).show()
@@ -83,9 +90,12 @@ fun MachineListSection() {
     }
 }
 
+// -------------------- MACHINE ROW --------------------
+
 @Composable
 fun MachineRow(
     machine: Map<String, Any>,
+    navController: NavController,
     onDelete: () -> Unit
 ) {
 
@@ -99,13 +109,15 @@ fun MachineRow(
         else -> null
     }
 
+    var showDialog by remember { mutableStateOf(false) }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        // IMAGE
+        // -------- IMAGE --------
         Box(
             modifier = Modifier
                 .size(90.dp)
@@ -122,7 +134,7 @@ fun MachineRow(
             }
         }
 
-        // DETAILS
+        // -------- DETAILS --------
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -134,13 +146,49 @@ fun MachineRow(
             Text("Utilization: $utilization%")
         }
 
-        // DELETE BUTTON
-        IconButton(onClick = onDelete) {
+        // -------- EDIT BUTTON --------
+        IconButton(onClick = {
+            val id = machine["id"] as? String ?: return@IconButton
+            navController.navigate("add_machine/$id") // 🔥 EDIT FLOW
+        }) {
+            Icon(Icons.Default.Edit, contentDescription = "Edit")
+        }
+
+        // -------- DELETE BUTTON --------
+        IconButton(onClick = {
+            showDialog = true
+        }) {
             Icon(
                 imageVector = Icons.Default.Delete,
                 contentDescription = "Delete",
                 tint = MaterialTheme.colorScheme.error
             )
         }
+    }
+
+    // -------- CONFIRM DELETE DIALOG --------
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Delete Machine") },
+            text = { Text("Are you sure you want to delete this machine?") },
+
+            confirmButton = {
+                TextButton(onClick = {
+                    showDialog = false
+                    onDelete()
+                }) {
+                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                }
+            },
+
+            dismissButton = {
+                TextButton(onClick = {
+                    showDialog = false
+                }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
