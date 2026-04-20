@@ -10,6 +10,10 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.cti_cart.data.FirebaseRepository
 import androidx.compose.ui.Alignment
+import android.widget.Toast
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun MachineListSection() {
@@ -17,11 +21,18 @@ fun MachineListSection() {
     var machines by remember { mutableStateOf<List<Map<String, Any>>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
 
-    LaunchedEffect(Unit) {
+    val context = LocalContext.current
+
+    fun loadMachines() {
+        isLoading = true
         FirebaseRepository.getMachinesBySupplier {
             machines = it
             isLoading = false
         }
+    }
+
+    LaunchedEffect(Unit) {
+        loadMachines()
     }
 
     when {
@@ -39,11 +50,33 @@ fun MachineListSection() {
         }
 
         else -> {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+
                 machines.forEach { machine ->
-                    MachineRow(machine)
+                    MachineRow(
+                        machine = machine,
+                        onDelete = {
+                            val id = machine["id"] as? String ?: return@MachineRow
+
+                            val imageUrl = when {
+                                machine["imageUrl"] != null -> machine["imageUrl"] as String
+                                machine["images"] is List<*> -> (machine["images"] as List<*>).firstOrNull() as? String
+                                else -> null
+                            }
+
+                            FirebaseRepository.deleteMachine(
+                                documentId = id,
+                                imageUrl = imageUrl,
+                                onSuccess = {
+                                    Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+                                    loadMachines() // 🔥 refresh
+                                },
+                                onFailure = {
+                                    Toast.makeText(context, "Error: ${it.message}", Toast.LENGTH_SHORT).show()
+                                }
+                            )
+                        }
+                    )
                 }
             }
         }
@@ -51,7 +84,10 @@ fun MachineListSection() {
 }
 
 @Composable
-fun MachineRow(machine: Map<String, Any>) {
+fun MachineRow(
+    machine: Map<String, Any>,
+    onDelete: () -> Unit
+) {
 
     val name = machine["name"] as? String ?: ""
     val rate = machine["hourlyRate"] as? String ?: ""
@@ -65,13 +101,14 @@ fun MachineRow(machine: Map<String, Any>) {
 
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
 
-        // LEFT: IMAGE BOX
+        // IMAGE
         Box(
             modifier = Modifier
-                .size(100.dp)
+                .size(90.dp)
                 .border(1.dp, MaterialTheme.colorScheme.outline)
         ) {
             if (imageUrl != null) {
@@ -85,7 +122,7 @@ fun MachineRow(machine: Map<String, Any>) {
             }
         }
 
-        // RIGHT: DETAILS BOX
+        // DETAILS
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -95,6 +132,15 @@ fun MachineRow(machine: Map<String, Any>) {
             Text("Machine Name: $name")
             Text("Hourly Rate: $rate")
             Text("Utilization: $utilization%")
+        }
+
+        // DELETE BUTTON
+        IconButton(onClick = onDelete) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = "Delete",
+                tint = MaterialTheme.colorScheme.error
+            )
         }
     }
 }
