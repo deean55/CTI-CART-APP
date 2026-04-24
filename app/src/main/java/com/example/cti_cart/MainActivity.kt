@@ -17,6 +17,7 @@ import androidx.navigation.compose.*
 import com.example.cti_cart.ui.screens.AddDetailsScreen
 import com.example.cti_cart.ui.screens.AddMachineScreen
 import com.example.cti_cart.ui.screens.BuyerDashboardScreen
+import com.example.cti_cart.ui.screens.DrawingViewerScreen
 import com.example.cti_cart.ui.screens.MapPickerScreen
 import com.example.cti_cart.ui.screens.MyRFQsScreen
 import com.example.cti_cart.ui.screens.PostRFQScreen
@@ -85,6 +86,11 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("my_rfqs") {
                     MyRFQsScreen(navController)
+                }
+
+                composable("viewer/{url}") { backStackEntry ->
+                    val url = backStackEntry.arguments?.getString("url") ?: ""
+                    DrawingViewerScreen(navController, url)
                 }
                 composable("upload_machine") { /* UploadMachineScreen() */ }
                 composable("view_machines") { /* ViewMachinesScreen() */ }
