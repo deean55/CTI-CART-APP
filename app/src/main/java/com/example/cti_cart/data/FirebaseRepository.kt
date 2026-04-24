@@ -1,6 +1,7 @@
 package com.example.cti_cart.data
 
 import android.net.Uri
+import android.util.Log
 import com.example.cti_cart.data.model.RFQ
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -60,7 +61,7 @@ object FirebaseRepository {
             }
     }
 
-    // -------------------- UPLOAD ANY FILE (PDF / CAD / IMAGE) --------------------
+    // -------------------- UPLOAD ANY FILE --------------------
 
     fun uploadFile(
         uri: Uri,
@@ -140,6 +141,7 @@ object FirebaseRepository {
                 onFailure(it)
             }
     }
+
     // -------------------- COMBINED MACHINE UPLOAD --------------------
 
     fun uploadMachineWithImage(
@@ -202,6 +204,33 @@ object FirebaseRepository {
             }
     }
 
+    // -------------------- GET MY RFQs --------------------
+
+    fun getMyRFQs(
+        onResult: (List<RFQ>) -> Unit
+    ) {
+        val userId = auth.currentUser?.uid
+        Log.d("USER_CHECK", auth.currentUser?.uid ?: "NULL")
+        if (userId == null) {
+            onResult(emptyList())
+            return
+        }
+
+        firestore.collection("rfqs")
+            .whereEqualTo("userId", userId)
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener { result ->
+                val list = result.toObjects(RFQ::class.java)
+                Log.d("RFQ_DATA", list.toString())
+                onResult(list)
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                onResult(emptyList())
+            }
+    }
+
     // -------------------- GET ALL MACHINES --------------------
 
     fun getAllMachines(
@@ -225,10 +254,16 @@ object FirebaseRepository {
     fun getMachinesBySupplier(
         onResult: (List<Map<String, Any>>) -> Unit
     ) {
-        val userId = auth.currentUser?.uid ?: return
+        val userId = auth.currentUser?.uid
+
+        if (userId == null) {
+            onResult(emptyList())
+            return
+        }
 
         firestore.collection("machines")
             .whereEqualTo("supplierId", userId)
+            .orderBy("createdAt", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { result ->
                 val list = result.documents.mapNotNull { it.data }

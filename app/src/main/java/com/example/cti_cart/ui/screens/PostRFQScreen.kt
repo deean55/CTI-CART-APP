@@ -24,6 +24,7 @@ import androidx.navigation.NavController
 import com.example.cti_cart.data.FirebaseRepository
 import com.example.cti_cart.data.model.RFQ
 import java.util.*
+import androidx.compose.foundation.layout.statusBarsPadding
 
 @Composable
 fun PostRFQScreen(navController: NavController) {
@@ -63,7 +64,8 @@ fun PostRFQScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .statusBarsPadding() // 🔥 fixes top overlap (important)
+            .padding(horizontal = 16.dp, vertical = 12.dp) // cleaner than single 16dp
             .verticalScroll(rememberScrollState())
     ) {
 

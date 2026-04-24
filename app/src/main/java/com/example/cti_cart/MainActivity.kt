@@ -18,6 +18,7 @@ import com.example.cti_cart.ui.screens.AddDetailsScreen
 import com.example.cti_cart.ui.screens.AddMachineScreen
 import com.example.cti_cart.ui.screens.BuyerDashboardScreen
 import com.example.cti_cart.ui.screens.MapPickerScreen
+import com.example.cti_cart.ui.screens.MyRFQsScreen
 import com.example.cti_cart.ui.screens.PostRFQScreen
 import com.example.cti_cart.ui.screens.SupplierDashboardScreen
 
@@ -81,6 +82,9 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("post_job") {
                     PostRFQScreen(navController)
+                }
+                composable("my_rfqs") {
+                    MyRFQsScreen(navController)
                 }
                 composable("upload_machine") { /* UploadMachineScreen() */ }
                 composable("view_machines") { /* ViewMachinesScreen() */ }

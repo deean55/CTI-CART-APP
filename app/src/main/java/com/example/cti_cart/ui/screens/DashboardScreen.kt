@@ -27,38 +27,73 @@ fun logout(navController: NavController) {
     }
 }
 
+// 🔥 UPDATED HEADER WITH USERNAME
 @Composable
 fun DashboardHeader(
     title: String,
     navController: NavController,
-    showSwitch: Boolean = true
+    showSwitch: Boolean = true,
+    showUserName: Boolean = false
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleLarge
-        )
+    var userName by remember { mutableStateOf("Loading...") }
 
-        Row {
-            if (showSwitch) {
-                TextButton(onClick = {
-                    navController.navigate("role_selection") {
-                        popUpTo("dashboard") { inclusive = true }
+    // 🔥 Fetch username
+    LaunchedEffect(Unit) {
+        val userId = FirebaseRepository.auth.currentUser?.uid
+
+        if (userId != null) {
+            FirebaseRepository.firestore.collection("users")
+                .document(userId)
+                .get()
+                .addOnSuccessListener {
+                    userName = it.getString("fullName") ?: "User"
+                }
+                .addOnFailureListener {
+                    userName = "User"
+                }
+        }
+    }
+
+    Column {
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            Row {
+                if (showSwitch) {
+                    TextButton(onClick = {
+                        navController.navigate("role_selection") {
+                            popUpTo("dashboard") { inclusive = true }
+                        }
+                    }) {
+                        Text("Switch")
                     }
+                }
+
+                TextButton(onClick = {
+                    logout(navController)
                 }) {
-                    Text("Switch")
+                    Text("Logout")
                 }
             }
+        }
 
-            TextButton(onClick = {
-                logout(navController)
-            }) {
-                Text("Logout")
-            }
+        // 🔥 Username below title
+        if (showUserName) {
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Hi, $userName 👋",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }
@@ -77,7 +112,6 @@ fun SupplierDashboardScreen(navController: NavController) {
             .padding(16.dp)
     ) {
 
-        // Header
         DashboardHeader("Supplier Dashboard", navController)
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -90,47 +124,32 @@ fun SupplierDashboardScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Action Cards
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
             DashboardCard(
-                title = "Add Details",
-                icon = Icons.Default.Edit,
-                color = Color(0xFF1976D2)
-            ) {
-                navController.navigate("add_details")
-            }
+                "Add Details",
+                Icons.Default.Edit,
+                Color(0xFF1976D2)
+            ) { navController.navigate("add_details") }
 
             DashboardCard(
-                title = "Add Machine",
-                icon = Icons.Default.Build,
-                color = Color(0xFF388E3C)
-            ) {
-                navController.navigate("add_machine")
-            }
+                "Add Machine",
+                Icons.Default.Build,
+                Color(0xFF388E3C)
+            ) { navController.navigate("add_machine") }
 
             DashboardCard(
-                title = if (showHistory) "History ▲" else "History ▼",
-                icon = Icons.Default.History,
-                color = Color(0xFFF57C00)
-            ) {
-                showHistory = !showHistory
-            }
+                if (showHistory) "History ▲" else "History ▼",
+                Icons.Default.History,
+                Color(0xFFF57C00)
+            ) { showHistory = !showHistory }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // -------- INLINE MACHINE LIST --------
-
         if (showHistory) {
-
-            Text(
-                text = "Machine History",
-                style = MaterialTheme.typography.titleMedium
-            )
-
+            Text("Machine History", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(12.dp))
-
             MachineListSection(navController)
         }
     }
@@ -190,7 +209,12 @@ fun BuyerDashboardScreen(navController: NavController) {
             .padding(16.dp)
     ) {
 
-        DashboardHeader("Buyer Dashboard", navController)
+        // 🔥 UPDATED HEADER CALL
+        DashboardHeader(
+            title = "Buyer Dashboard",
+            navController = navController,
+            showUserName = true // 👈 IMPORTANT
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -242,20 +266,10 @@ fun TwoCardRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
 
-        ActionCard(
-            title = title1,
-            color = color1,
-            modifier = Modifier.weight(1f),
-            onClick = onClick1
-        )
+        ActionCard(title1, color1, Modifier.weight(1f), onClick1)
 
         if (title2.isNotEmpty()) {
-            ActionCard(
-                title = title2,
-                color = color2,
-                modifier = Modifier.weight(1f),
-                onClick = onClick2
-            )
+            ActionCard(title2, color2, Modifier.weight(1f), onClick2)
         } else {
             Spacer(modifier = Modifier.weight(1f))
         }
