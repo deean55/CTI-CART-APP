@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     implementation(libs.play.services.basement)
     implementation(libs.play.services.location)
+    implementation(libs.androidx.foundation)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -88,6 +89,8 @@ dependencies {
     implementation ("com.google.firebase:firebase-storage")
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("com.google.firebase:firebase-storage-ktx")
+    implementation("androidx.compose.ui:ui:1.6.0")
+    implementation("androidx.compose.material3:material3:1.2.0")
 
 
 }

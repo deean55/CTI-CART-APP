@@ -11,6 +11,7 @@ composeBom = "2024.09.00"
 foundation = "1.10.5"
 playServicesBasement = "18.10.0"
 playServicesLocation = "21.3.0"
+foundationVersion = "1.11.0"
 
 [libraries]
 navigation-compose = { module = "androidx.navigation:navigation-compose", version = "2.7.7" }
@@ -31,6 +32,7 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 play-services-basement = { group = "com.google.android.gms", name = "play-services-basement", version.ref = "playServicesBasement" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundationVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

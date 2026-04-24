@@ -195,9 +195,9 @@ fun BuyerDashboardScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         TwoCardRow(
-            "Post Requirement",
+            "POST NEW JOB",
             Color(0xFF1976D2),
-            { navController.navigate("post_rfq") },
+            { navController.navigate("post_job") },
 
             "My RFQs",
             Color(0xFF388E3C),

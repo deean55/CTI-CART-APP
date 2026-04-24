@@ -79,6 +79,9 @@ class MainActivity : ComponentActivity() {
                 composable("post_rfq") {
                     PostRFQScreen(navController)
                 }
+                composable("post_job") {
+                    PostRFQScreen(navController)
+                }
                 composable("upload_machine") { /* UploadMachineScreen() */ }
                 composable("view_machines") { /* ViewMachinesScreen() */ }
                 composable("upload_certificate") { /* UploadCertificateScreen() */ }
