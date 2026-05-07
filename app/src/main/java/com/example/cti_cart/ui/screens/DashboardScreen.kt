@@ -112,7 +112,11 @@ fun SupplierDashboardScreen(navController: NavController) {
             .padding(16.dp)
     ) {
 
-        DashboardHeader("Supplier Dashboard", navController)
+        DashboardHeader(
+            title = "Supplier Dashboard",
+            navController = navController,
+            showUserName = true
+        )
 
         Spacer(modifier = Modifier.height(8.dp))
 
