@@ -17,7 +17,7 @@ import androidx.navigation.NavController
 import com.example.cti_cart.data.FirebaseRepository
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.foundation.layout.statusBarsPadding
-
+import androidx.compose.ui.text.style.TextAlign
 // -------------------- COMMON --------------------
 
 fun logout(navController: NavController) {
@@ -128,74 +128,120 @@ fun SupplierDashboardScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        // FIRST ROW
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
 
             DashboardCard(
-                "Add Details",
-                Icons.Default.Edit,
-                Color(0xFF1976D2)
-            ) { navController.navigate("add_details") }
+                title = "Add Details",
+                icon = Icons.Default.Edit,
+                color = Color(0xFF1976D2),
+                modifier = Modifier.weight(1f)
+            ) {
+                navController.navigate("add_details")
+            }
 
             DashboardCard(
-                "Add Machine",
-                Icons.Default.Build,
-                Color(0xFF388E3C)
-            ) { navController.navigate("add_machine") }
+                title = "Add/View Machines",
+                icon = Icons.Default.Build,
+                color = Color(0xFF388E3C),
+                modifier = Modifier.weight(1f)
+            ) {
+                navController.navigate("add_machine")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // SECOND ROW
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
 
             DashboardCard(
-                if (showHistory) "History ▲" else "History ▼",
-                Icons.Default.History,
-                Color(0xFFF57C00)
-            ) { showHistory = !showHistory }
+                title = "Buyer RFQs",
+                icon = Icons.Default.List,
+                color = Color(0xFF8E24AA),
+                modifier = Modifier.weight(1f)
+            ) {
+                navController.navigate("my_rfqs")
+            }
+
+            DashboardCard(
+                title = if (showHistory) "History ▲" else "History ▼",
+                icon = Icons.Default.History,
+                color = Color(0xFFF57C00),
+                modifier = Modifier.weight(1f)
+            ) {
+                showHistory = !showHistory
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         if (showHistory) {
-            Text("Machine History", style = MaterialTheme.typography.titleMedium)
+            Text(
+                "Machine History",
+                style = MaterialTheme.typography.titleMedium
+            )
+
             Spacer(modifier = Modifier.height(12.dp))
+
             MachineListSection(navController)
         }
     }
 }
 
 // -------------------- DASHBOARD CARD --------------------
-
 @Composable
 fun DashboardCard(
     title: String,
     icon: ImageVector,
     color: Color,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
+
     Card(
         onClick = onClick,
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = color),
-        elevation = CardDefaults.cardElevation(6.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = color
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 6.dp
+        ),
+        modifier = modifier
+            .height(120.dp)
     ) {
-        Row(
-            modifier = Modifier.padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
             Icon(
                 imageVector = icon,
                 contentDescription = title,
                 tint = Color.White,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(30.dp)
             )
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             Text(
                 text = title,
                 color = Color.White,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center,
+                lineHeight = 16.sp
             )
         }
     }
