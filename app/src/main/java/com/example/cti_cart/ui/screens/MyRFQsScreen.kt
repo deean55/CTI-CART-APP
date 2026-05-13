@@ -98,7 +98,20 @@ fun RFQCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-            Text("Part: ${rfq.partName}")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                Text(
+                    text = rfq.partName,
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                RFQStatusBadge(rfq.status)
+            }
+
+
             Text("Qty: ${rfq.quantity}")
             Text("Machine: ${rfq.machine}")
             Text("Required By: ${formatDate(rfq.requiredBy)}")

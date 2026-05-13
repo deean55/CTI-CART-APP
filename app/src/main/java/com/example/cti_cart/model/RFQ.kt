@@ -8,5 +8,6 @@ data class RFQ(
     val machine: String = "",
     val requiredBy: String = "",
     val fileUrl: String = "",
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+    val status: String = "Open"
 )
