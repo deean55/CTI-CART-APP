@@ -304,4 +304,26 @@ object FirebaseRepository {
                 onFailure(it)
             }
     }
+
+    // -------------------- Get All RFQ's --------------------
+    fun getAllRFQs(onResult: (List<RFQ>) -> Unit) {
+
+        firestore.collection("rfqs")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener { result ->
+
+                val rfqs = result.documents.mapNotNull { document ->
+
+                    document.toObject(RFQ::class.java)?.copy(
+                        id = document.id
+                    )
+                }
+
+                onResult(rfqs)
+            }
+            .addOnFailureListener {
+                onResult(emptyList())
+            }
+    }
 }

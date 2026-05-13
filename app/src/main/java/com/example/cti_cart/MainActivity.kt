@@ -17,6 +17,7 @@ import androidx.navigation.compose.*
 import com.example.cti_cart.ui.screens.AddDetailsScreen
 import com.example.cti_cart.ui.screens.AddMachineScreen
 import com.example.cti_cart.ui.screens.BuyerDashboardScreen
+import com.example.cti_cart.ui.screens.BuyerRFQsScreen
 import com.example.cti_cart.ui.screens.DrawingViewerScreen
 import com.example.cti_cart.ui.screens.MapPickerScreen
 import com.example.cti_cart.ui.screens.MyRFQsScreen
@@ -86,6 +87,9 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("my_rfqs") {
                     MyRFQsScreen(navController)
+                }
+                composable("buyer_rfqs") {
+                    BuyerRFQsScreen(navController)
                 }
 
                 composable("viewer/{url}") { backStackEntry ->

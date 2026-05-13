@@ -167,7 +167,7 @@ fun SupplierDashboardScreen(navController: NavController) {
                 color = Color(0xFF8E24AA),
                 modifier = Modifier.weight(1f)
             ) {
-                navController.navigate("my_rfqs")
+                navController.navigate("buyer_rfqs")
             }
 
             DashboardCard(
