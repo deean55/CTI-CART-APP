@@ -62,7 +62,12 @@ fun MapPickerScreen(navController: NavController) {
             Card {
                 Column(modifier = Modifier.padding(12.dp)) {
 
-                    Text(address)
+                    Text(
+                        text = if (address.isNotEmpty())
+                            address
+                        else
+                            "Tap on map to select location"
+                    )
 
                     Spacer(modifier = Modifier.height(8.dp))
 

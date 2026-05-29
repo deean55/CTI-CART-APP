@@ -135,7 +135,7 @@ fun SupplierDashboardScreen(navController: NavController) {
         ) {
 
             DashboardCard(
-                title = "Add Details",
+                title = "Add/View Details",
                 icon = Icons.Default.Edit,
                 color = Color(0xFF1976D2),
                 modifier = Modifier.weight(1f)

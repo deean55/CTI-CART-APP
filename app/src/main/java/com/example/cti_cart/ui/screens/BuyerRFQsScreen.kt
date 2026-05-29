@@ -28,7 +28,6 @@ fun BuyerRFQsScreen(navController: NavController) {
             rfqList = it
             isLoading = false
         }
-
     }
 
     Column(
@@ -80,13 +79,15 @@ fun BuyerRFQsScreen(navController: NavController) {
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(
                                 containerColor = Color(0xFFF3F0F7)
-                            )
+                            ),
+                            elevation = CardDefaults.cardElevation(8.dp)
                         ) {
 
                             Column(
                                 modifier = Modifier.padding(16.dp)
                             ) {
 
+                                // TITLE + STATUS
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween
@@ -99,26 +100,95 @@ fun BuyerRFQsScreen(navController: NavController) {
 
                                     RFQStatusBadge(rfq.status)
                                 }
+
+                                Spacer(modifier = Modifier.height(6.dp))
+
                                 Text("Qty: ${rfq.quantity}")
                                 Text("Machine: ${rfq.machine}")
                                 Text("Required By: ${formatDate(rfq.requiredBy)}")
 
                                 Spacer(modifier = Modifier.height(12.dp))
 
-                                if (rfq.fileUrl.isNotEmpty()) {
+                                // FIRST ROW
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
 
+                                    // VIEW DRAWING
+                                    if (rfq.fileUrl.isNotEmpty()) {
+
+                                        OutlinedButton(
+                                            modifier = Modifier.weight(1f),
+                                            onClick = {
+
+                                                val encodedUrl =
+                                                    Uri.encode(rfq.fileUrl)
+
+                                                navController.navigate(
+                                                    "viewer/$encodedUrl"
+                                                )
+                                            }
+                                        ) {
+                                            Text("Drawing")
+                                        }
+                                    }
+
+                                    // SEND QUOTE
                                     Button(
+                                        modifier = Modifier.weight(1f),
                                         onClick = {
 
-                                            val encodedUrl =
-                                                Uri.encode(rfq.fileUrl)
-
-                                            navController.navigate(
-                                                "viewer/$encodedUrl"
-                                            )
+                                            println("Send Quote Clicked")
                                         }
                                     ) {
-                                        Text("View Drawing")
+                                        Text("Quote")
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                // SECOND ROW
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+
+                                    // INTERESTED
+                                    OutlinedButton(
+                                        modifier = Modifier.weight(1f),
+                                        onClick = {
+
+                                            FirebaseRepository.firestore
+                                                .collection("rfqs")
+                                                .document(rfq.id)
+                                                .update(
+                                                    "status",
+                                                    "Quoted"
+                                                )
+                                                .addOnSuccessListener {
+
+                                                    FirebaseRepository.getAllRFQs {
+                                                        rfqList = it
+                                                    }
+                                                }
+                                        }
+                                    ) {
+                                        Text("Interested")
+                                    }
+
+                                    // CHAT BUYER
+                                    Button(
+                                        modifier = Modifier.weight(1f),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color(0xFF2E7D32)
+                                        ),
+                                        onClick = {
+
+                                            println("Chat Buyer Clicked")
+                                        }
+                                    ) {
+                                        Text("Chat")
                                     }
                                 }
                             }

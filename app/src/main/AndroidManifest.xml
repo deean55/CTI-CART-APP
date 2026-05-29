@@ -21,7 +21,7 @@
         <!-- GOOGLE MAPS LOCATION PICKER     -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_GOOGLE_MAPS_API_KEY"/>
+            android:value="AIzaSyC4cpeYDogQXFxUDmtNgzKthZ_Ve87Q1PA"/>
 
         <activity
             android:name=".MainActivity"

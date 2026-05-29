@@ -49,9 +49,6 @@ class MainActivity : ComponentActivity() {
                 composable("register") {
                     RegisterScreen(navController)
                 }
-                composable("mapPicker") {
-                    MapPickerScreen(navController)
-                }
 
                 composable("role") {
                     RoleSelectionScreen(navController)
@@ -90,6 +87,9 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("buyer_rfqs") {
                     BuyerRFQsScreen(navController)
+                }
+                composable("map_picker") {
+                    MapPickerScreen(navController)
                 }
 
                 composable("viewer/{url}") { backStackEntry ->

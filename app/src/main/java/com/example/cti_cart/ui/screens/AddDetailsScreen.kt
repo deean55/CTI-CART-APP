@@ -8,8 +8,9 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
-
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
+
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -75,12 +76,40 @@ fun AddDetailsScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Location
+        // Receive selected location from MapPickerScreen
+        val selectedLocation =
+            navController.currentBackStackEntry
+                ?.savedStateHandle
+                ?.getStateFlow("selected_location", "")
+                ?.collectAsState()
+
+        LaunchedEffect(selectedLocation?.value) {
+            if (!selectedLocation?.value.isNullOrEmpty()) {
+                location = selectedLocation!!.value
+            }
+        }
+
+// Location Picker Field
         OutlinedTextField(
             value = location,
-            onValueChange = { location = it },
-            label = { Text("Location") },
-            modifier = Modifier.fillMaxWidth()
+            onValueChange = {},
+            readOnly = true,
+            label = {
+                Text("Location")
+            },
+            modifier = Modifier.fillMaxWidth(),
+            trailingIcon = {
+                IconButton(
+                    onClick = {
+                        navController.navigate("map_picker")
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.LocationOn,
+                        contentDescription = "Pick Location"
+                    )
+                }
+            }
         )
 
         Spacer(modifier = Modifier.height(12.dp))
