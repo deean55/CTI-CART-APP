@@ -101,7 +101,7 @@ fun AddDetailsScreen(navController: NavController) {
             trailingIcon = {
                 IconButton(
                     onClick = {
-                        navController.navigate("map_picker")
+                                navController.navigate("map_picker")
                     }
                 ) {
                     Icon(

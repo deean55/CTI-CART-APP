@@ -77,6 +77,15 @@ fun MapPickerScreen(navController: NavController) {
                                 ?.savedStateHandle
                                 ?.set("selected_location", address)
 
+                            //29-May Added Longitude and Latitude Save
+                            navController.previousBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("selected_latitude", markerPosition.latitude)
+
+                            navController.previousBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("selected_longitude", markerPosition.longitude)
+
                             navController.popBackStack()
                         },
                         modifier = Modifier.fillMaxWidth()

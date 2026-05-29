@@ -71,6 +71,15 @@ fun RegisterScreen(navController: NavController) {
             ?.observeForever { selected ->
                 location = selected
             }
+        savedStateHandle?.getLiveData<Double>("selected_latitude")
+            ?.observeForever { selectedLat ->
+                latitude = selectedLat
+            }
+
+        savedStateHandle?.getLiveData<Double>("selected_longitude")
+            ?.observeForever { selectedLng ->
+                longitude = selectedLng
+            }
     }
     Column(
         modifier = Modifier
@@ -111,42 +120,66 @@ fun RegisterScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    navController.navigate("mapPicker")
+                    navController.navigate("map_picker")
                 }
         ) {
             OutlinedTextField(
                 value = location,
                 onValueChange = {},
+                readOnly = true,
                 label = { Text("Select Location") },
                 modifier = Modifier.fillMaxWidth(),
-                readOnly = true,
-                enabled = true,
-                leadingIcon = { Icon(Icons.Default.LocationOn, null) },
+                leadingIcon = {
+                    Icon(Icons.Default.LocationOn, null)
+                },
                 trailingIcon = {
-                    if (loading) {
-                        CircularProgressIndicator(modifier = Modifier.size(20.dp))
-                    } else {
-                        IconButton(onClick = {
+                    Row {
 
-                            loading = true
-
-                            if (ActivityCompat.checkSelfPermission(
-                                    context,
-                                    Manifest.permission.ACCESS_FINE_LOCATION
-                                ) == PackageManager.PERMISSION_GRANTED
-                            ) {
-                                getLocation(context, fusedLocationClient) { address, lat, lng ->
-                                    location = address
-                                    latitude = lat
-                                    longitude = lng
-                                    loading = false
-                                }
-                            } else {
-                                permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                        IconButton(
+                            onClick = {
+                                navController.navigate("map_picker")
                             }
+                        ) {
+                            Icon(
+                                Icons.Default.LocationOn,
+                                contentDescription = "Pick Location"
+                            )
+                        }
 
-                        }) {
-                            Icon(Icons.Default.MyLocation, "Auto Detect")
+                        IconButton(
+                            onClick = {
+
+                                loading = true
+
+                                if (
+                                    ActivityCompat.checkSelfPermission(
+                                        context,
+                                        Manifest.permission.ACCESS_FINE_LOCATION
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                ) {
+
+                                    getLocation(
+                                        context,
+                                        fusedLocationClient
+                                    ) { address, lat, lng ->
+
+                                        location = address
+                                        latitude = lat
+                                        longitude = lng
+                                        loading = false
+                                    }
+
+                                } else {
+                                    permissionLauncher.launch(
+                                        Manifest.permission.ACCESS_FINE_LOCATION
+                                    )
+                                }
+                            }
+                        ) {
+                            Icon(
+                                Icons.Default.MyLocation,
+                                contentDescription = "Auto Detect"
+                            )
                         }
                     }
                 }
