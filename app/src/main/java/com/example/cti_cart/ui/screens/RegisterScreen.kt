@@ -130,9 +130,7 @@ fun RegisterScreen(navController: NavController) {
                 readOnly = true,
                 label = { Text("Select Location") },
                 modifier = Modifier.fillMaxWidth(),
-                leadingIcon = {
-                    Icon(Icons.Default.LocationOn, null)
-                },
+
                 trailingIcon = {
                     Row {
 
@@ -229,7 +227,9 @@ fun RegisterScreen(navController: NavController) {
                             .set(user)
                             .addOnSuccessListener {
                                 registering = false   // 👈 add here
-                                navController.navigate("dashboard")
+                                navController.navigate("role") {
+                                    popUpTo("register") { inclusive = true }
+                                }
                             }
                             .addOnFailureListener {
                                 registering = false
