@@ -27,6 +27,7 @@ import com.google.android.gms.location.LocationServices
 import java.util.*
 import com.example.cti_cart.data.FirebaseRepository
 import com.example.cti_cart.model.User
+import androidx.compose.runtime.saveable.rememberSaveable
 
 
 @Composable
@@ -39,16 +40,16 @@ fun RegisterScreen(navController: NavController) {
         LocationServices.getFusedLocationProviderClient(context)
     }
 
-    var name by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var company by remember { mutableStateOf("") }
-    var location by remember { mutableStateOf("") }
+    var name by rememberSaveable  { mutableStateOf("") }
+    var phone by rememberSaveable  { mutableStateOf("") }
+    var email by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var company by rememberSaveable { mutableStateOf("") }
+    var location by rememberSaveable { mutableStateOf("") }
     var loading by remember { mutableStateOf(false) }
-    var registering by remember { mutableStateOf(false) }
-    var latitude by remember { mutableStateOf(0.0) }
-    var longitude by remember { mutableStateOf(0.0) }
+    var registering by rememberSaveable { mutableStateOf(false) }
+    var latitude by rememberSaveable { mutableStateOf(0.0) }
+    var longitude by rememberSaveable { mutableStateOf(0.0) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
