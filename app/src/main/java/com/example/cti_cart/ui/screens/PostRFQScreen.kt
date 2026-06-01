@@ -34,7 +34,7 @@ fun PostRFQScreen(navController: NavController) {
     var partName by remember { mutableStateOf("") }
     var quantity by remember { mutableStateOf("") }
     var requiredBy by remember { mutableStateOf("") }
-    var selectedMachine by remember { mutableStateOf("CNC Turning") }
+    var selectedMachine by remember { mutableStateOf("CNC VMC") }
     var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
     var isLoading by remember { mutableStateOf(false) }
 
@@ -100,9 +100,9 @@ fun PostRFQScreen(navController: NavController) {
 
         OutlinedTextField(
             value = requiredBy,
-            onValueChange = {},
+            onValueChange = {selectedMachine = it},
             label = { Text("Required By") },
-            readOnly = true,
+            readOnly = false,
             modifier = Modifier.fillMaxWidth(),
             trailingIcon = {
                 IconButton(onClick = { datePickerDialog.show() }) {
@@ -112,8 +112,14 @@ fun PostRFQScreen(navController: NavController) {
         )
 
         Spacer(modifier = Modifier.height(12.dp))
+        OutlinedTextField(
+            value = selectedMachine,
+            onValueChange = { selectedMachine = it },
+            label = { Text("Machine Required") },
+            modifier = Modifier.fillMaxWidth()
+        )
 
-        // Dropdown
+        /*  Dropdown Code Inactive
         Box {
             OutlinedTextField(
                 value = selectedMachine,
@@ -143,7 +149,7 @@ fun PostRFQScreen(navController: NavController) {
                     .matchParentSize()
                     .clickable { expanded = true }
             )
-        }
+        } */
 
         Spacer(modifier = Modifier.height(20.dp))
 
