@@ -1,5 +1,6 @@
 package com.example.cti_cart.ui.screens
 
+import android.R.style
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.layout.*
@@ -17,11 +18,19 @@ import androidx.navigation.NavController
 import com.example.cti_cart.data.FirebaseRepository
 import com.example.cti_cart.data.model.RFQ
 
+
 private const val RFQ_RADIUS_KM = 10.0
+
+data class RFQWithDistance(
+    val rfq: RFQ,
+    val distanceKm: Double
+)
 @Composable
 fun BuyerRFQsScreen(navController: NavController) {
 
-    var rfqList by remember { mutableStateOf<List<RFQ>>(emptyList()) }
+    var rfqList by remember {
+        mutableStateOf<List<RFQWithDistance>>(emptyList())
+    }
     var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
@@ -49,7 +58,7 @@ fun BuyerRFQsScreen(navController: NavController) {
                 FirebaseRepository.getAllRFQs { allRfqs ->
 
                     val nearbyRfqs =
-                        mutableListOf<RFQ>()
+                        mutableListOf<RFQWithDistance>()
 
                     var processedCount = 0
 
@@ -92,7 +101,12 @@ fun BuyerRFQsScreen(navController: NavController) {
                                     "Buyer=${rfq.userId} Distance=$distanceKm km"
                                 )
                                 if (distanceKm <= RFQ_RADIUS_KM) {
-                                    nearbyRfqs.add(rfq)
+                                    nearbyRfqs.add(
+                                        RFQWithDistance(
+                                            rfq = rfq,
+                                            distanceKm = distanceKm
+                                        )
+                                    )
                                     Log.d(
                                         "RFQ_DISTANCE",
                                         "Showing RFQ ${rfq.partName} from buyer ${rfq.userId}"
@@ -173,7 +187,9 @@ fun BuyerRFQsScreen(navController: NavController) {
                         contentPadding = PaddingValues(bottom = 80.dp)
                     ) {
 
-                        items(rfqList) { rfq ->
+                        items(rfqList) { item ->
+
+                            val rfq = item.rfq
 
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
@@ -207,6 +223,14 @@ fun BuyerRFQsScreen(navController: NavController) {
                                     Text("Qty: ${rfq.quantity}")
                                     Text("Machine: ${rfq.machine}")
                                     Text("Required By: ${formatDate(rfq.requiredBy)}")
+
+                                    Text(
+                                        text = String.format(
+                                            "Distance: %.1f km",
+                                            item.distanceKm
+                                        ),
+                                        color = Color.DarkGray
+                                    )
 
                                     Spacer(modifier = Modifier.height(12.dp))
 
