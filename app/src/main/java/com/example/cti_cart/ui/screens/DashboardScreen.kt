@@ -184,13 +184,16 @@ fun SupplierDashboardScreen(navController: NavController) {
 
         if (showHistory) {
             Text(
-                "Machine History",
+                text = "Activity History",
                 style = MaterialTheme.typography.titleMedium
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            MachineListSection(navController)
+            Text(
+                text = "Recent supplier activity will be shown here.",
+                color = Color.Gray
+            )
         }
     }
 }

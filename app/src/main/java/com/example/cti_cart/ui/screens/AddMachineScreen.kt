@@ -184,7 +184,11 @@ fun AddMachineScreen(
 
                                 updateMachine(machineId!!, machineName, hourlyRate, utilization, newUrl, context) {
                                     isLoading = false
-                                    navController.popBackStack()
+                                    Toast.makeText(
+                                        context,
+                                        "Machine Updated",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                             },
                             onFailure = {
@@ -195,7 +199,7 @@ fun AddMachineScreen(
                         // No new image → keep old
                         updateMachine(machineId!!, machineName, hourlyRate, utilization, existingImageUrl, context) {
                             isLoading = false
-                            navController.popBackStack()
+                            Toast.makeText(context, "Machine Updated", Toast.LENGTH_SHORT).show()
                         }
                     }
 
@@ -215,7 +219,10 @@ fun AddMachineScreen(
                         onSuccess = {
                             isLoading = false
                             Toast.makeText(context, "Machine Added", Toast.LENGTH_SHORT).show()
-                            navController.popBackStack()
+                            machineName = ""
+                            hourlyRate = ""
+                            utilization = ""
+                            imageUri = null
                         },
                         onFailure = {
                             isLoading = false
@@ -232,6 +239,18 @@ fun AddMachineScreen(
                 Text(if (isEditMode) "UPDATE" else "SUBMIT")
             }
         }
+        HorizontalDivider()
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "Added Machines",
+            style = MaterialTheme.typography.titleMedium
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        MachineListSection(navController)
     }
 }
 
@@ -246,6 +265,7 @@ fun updateMachine(
     context: android.content.Context,
     onDone: () -> Unit
 ) {
+
     val data = mutableMapOf<String, Any>(
         "name" to name,
         "hourlyRate" to rate,
