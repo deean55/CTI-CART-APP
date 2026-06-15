@@ -10,6 +10,8 @@ data class RFQ(
     val requiredBy: String = "",
     val fileUrl: String = "",
 
+    val interestedSuppliers: List<String> = emptyList(),
+
     val timestamp: Long = System.currentTimeMillis(),
     val status: String = "Open"
 )

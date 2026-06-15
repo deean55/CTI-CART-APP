@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.cti_cart.data.FirebaseRepository
 import com.example.cti_cart.data.model.RFQ
+import com.google.firebase.firestore.FieldValue
+
 
 
 private const val RFQ_RADIUS_KM = 10.0
@@ -280,38 +282,98 @@ fun BuyerRFQsScreen(navController: NavController) {
                                     ) {
 
                                         // INTERESTED
+                                        val currentSupplierId =
+                                            FirebaseRepository.auth.currentUser?.uid ?: ""
+
+                                        val isInterested =
+                                            rfq.interestedSuppliers.contains(currentSupplierId)
+
                                         OutlinedButton(
                                             modifier = Modifier.weight(1f),
+                                            enabled = !isInterested,
                                             onClick = {
+
+                                                val supplierId =
+                                                    FirebaseRepository.auth.currentUser?.uid ?: ""
+
+                                                val buyerId = rfq.userId
+
+                                                val chatId = "${rfq.id}_${supplierId}"
+
+                                                Log.d("CHAT_DEBUG", "RFQ ID = ${rfq.id}")
+                                                Log.d("CHAT_DEBUG", "Buyer ID = $buyerId")
+                                                Log.d("CHAT_DEBUG", "Supplier ID = $supplierId")
+                                                Log.d("CHAT_DEBUG", "Chat ID = $chatId")
 
                                                 FirebaseRepository.firestore
                                                     .collection("rfqs")
                                                     .document(rfq.id)
                                                     .update(
-                                                        "status",
-                                                        "Quoted"
+                                                        "interestedSuppliers",
+                                                        FieldValue.arrayUnion(currentSupplierId)
                                                     )
                                                     .addOnSuccessListener {
 
-                                                        // refresh screen
-                                                        navController.navigate("buyer_rfqs") {
-                                                            popUpTo("buyer_rfqs") { inclusive = true }
-                                                        }
+                                                        Log.d("CHAT_DEBUG", "Interested saved")
+
+                                                        FirebaseRepository.firestore
+                                                            .collection("chats")
+                                                            .document(chatId)
+                                                            .set(
+                                                                hashMapOf(
+                                                                    "rfqId" to rfq.id,
+                                                                    "buyerId" to buyerId,
+                                                                    "supplierId" to supplierId,
+                                                                    "createdAt" to System.currentTimeMillis()
+                                                                )
+                                                            )
+                                                            .addOnSuccessListener {
+
+                                                                Log.d("CHAT_DEBUG", "Chat created successfully")
+
+                                                                navController.navigate("buyer_rfqs") {
+                                                                    popUpTo("buyer_rfqs") {
+                                                                        inclusive = true
+                                                                    }
+                                                                }
+                                                            }
+                                                            .addOnFailureListener { e ->
+                                                                Log.e(
+                                                                    "CHAT_DEBUG",
+                                                                    "Chat create failed",
+                                                                    e
+                                                                )
+                                                            }
+                                                    }
+                                                    .addOnFailureListener { e ->
+                                                        Log.e(
+                                                            "CHAT_DEBUG",
+                                                            "Interested save failed",
+                                                            e
+                                                        )
                                                     }
                                             }
                                         ) {
-                                            Text("Interested")
+                                            Text(
+                                                if (isInterested)
+                                                    "Interested ✓"
+                                                else
+                                                    "Interested"
+                                            )
                                         }
 
                                         // CHAT BUYER
                                         Button(
-                                            modifier = Modifier.weight(1f),
-                                            colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color(0xFF2E7D32)
-                                            ),
+                                            enabled = isInterested,
                                             onClick = {
+                                                val supplierId =
+                                                    FirebaseRepository.auth.currentUser?.uid ?: ""
 
-                                                println("Chat Buyer Clicked")
+                                                val chatId = "${rfq.id}_${supplierId}"
+
+                                                navController.navigate(
+                                                    "chat/$chatId"
+                                                )
                                             }
                                         ) {
                                             Text("Chat")

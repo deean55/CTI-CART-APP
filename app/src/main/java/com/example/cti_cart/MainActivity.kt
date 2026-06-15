@@ -14,6 +14,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.*
+import com.cti.app.ui.screens.ChatScreen
 import com.example.cti_cart.ui.screens.AddDetailsScreen
 import com.example.cti_cart.ui.screens.AddMachineScreen
 import com.example.cti_cart.ui.screens.BuyerDashboardScreen
@@ -96,12 +97,24 @@ class MainActivity : ComponentActivity() {
                     val url = backStackEntry.arguments?.getString("url") ?: ""
                     DrawingViewerScreen(navController, url)
                 }
+
                 composable("upload_machine") { /* UploadMachineScreen() */ }
                 composable("view_machines") { /* ViewMachinesScreen() */ }
                 composable("upload_certificate") { /* UploadCertificateScreen() */ }
                 composable("view_certificates") { /* ViewCertificatesScreen() */ }
                 composable("posted_jobs") { /* PostedJobsScreen() */ }
+                //CHAT
+                composable(
+                    route = "chat/{chatId}"
+                ) { backStackEntry ->
 
+                    val chatId =
+                        backStackEntry.arguments?.getString("chatId") ?: ""
+
+                    ChatScreen(
+                        chatId = chatId
+                    )
+                }
                 composable("otp") {
                     OtpLoginScreen(navController)
                 }
