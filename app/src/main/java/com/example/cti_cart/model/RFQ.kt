@@ -9,6 +9,8 @@ data class RFQ(
     val machine: String = "",
     val requiredBy: String = "",
     val fileUrl: String = "",
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0,
 
     val interestedSuppliers: List<String> = emptyList(),
 

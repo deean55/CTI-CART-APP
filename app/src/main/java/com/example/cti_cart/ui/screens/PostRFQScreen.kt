@@ -182,67 +182,131 @@ fun PostRFQScreen(navController: NavController) {
 
                 isLoading = true
 
-                if (selectedFileUri != null) {
 
-                    FirebaseRepository.uploadFile(
-                        uri = selectedFileUri!!,
-                        onSuccess = { fileUrl ->
+
+                val buyerId =
+                    FirebaseRepository.auth.currentUser?.uid ?: run {
+                        isLoading = false
+                        return@Button
+                    }
+
+                FirebaseRepository.firestore
+                    .collection("users")
+                    .document(buyerId)
+                    .get()
+                    .addOnSuccessListener { userDoc ->
+
+                        val latitude =
+                            userDoc.getDouble("latitude") ?: 0.0
+
+                        val longitude =
+                            userDoc.getDouble("longitude") ?: 0.0
+
+                        if (selectedFileUri != null) {
+
+                            FirebaseRepository.uploadFile(
+                                uri = selectedFileUri!!,
+                                onSuccess = { fileUrl ->
+
+                                    val rfq = RFQ(
+                                        partName = partName,
+                                        quantity = quantity,
+                                        machine = selectedMachine,
+                                        requiredBy = requiredBy,
+                                        fileUrl = fileUrl,
+                                        latitude = latitude,
+                                        longitude = longitude
+                                    )
+
+                                    FirebaseRepository.saveRFQ(
+                                        rfq,
+                                        onSuccess = {
+                                            isLoading = false
+
+                                            Toast.makeText(
+                                                context,
+                                                "RFQ Posted",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+
+                                            navController.navigate("my_rfqs") {
+                                                popUpTo("post_rfq") {
+                                                    inclusive = true
+                                                }
+                                            }
+                                        },
+                                        onFailure = {
+                                            isLoading = false
+
+                                            Toast.makeText(
+                                                context,
+                                                "Error: ${it.message}",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        }
+                                    )
+                                },
+                                onFailure = {
+                                    isLoading = false
+
+                                    Toast.makeText(
+                                        context,
+                                        "Upload failed: ${it.message}",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            )
+
+                        } else {
 
                             val rfq = RFQ(
                                 partName = partName,
                                 quantity = quantity,
                                 machine = selectedMachine,
                                 requiredBy = requiredBy,
-                                fileUrl = fileUrl
+                                latitude = latitude,
+                                longitude = longitude
                             )
 
                             FirebaseRepository.saveRFQ(
                                 rfq,
                                 onSuccess = {
                                     isLoading = false
-                                    Toast.makeText(context, "RFQ Posted", Toast.LENGTH_SHORT).show()
+
+                                    Toast.makeText(
+                                        context,
+                                        "RFQ Posted",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
 
                                     navController.navigate("my_rfqs") {
-                                        popUpTo("post_rfq") { inclusive = true }
+                                        popUpTo("post_rfq") {
+                                            inclusive = true
+                                        }
                                     }
                                 },
                                 onFailure = {
                                     isLoading = false
-                                    Toast.makeText(context, "Error: ${it.message}", Toast.LENGTH_LONG).show()
+
+                                    Toast.makeText(
+                                        context,
+                                        "Error: ${it.message}",
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                 }
                             )
-                        },
-                        onFailure = {
-                            isLoading = false
-                            Toast.makeText(context, "Upload failed: ${it.message}", Toast.LENGTH_LONG).show()
                         }
-                    )
+                    }
+                    .addOnFailureListener {
 
-                } else {
+                        isLoading = false
 
-                    val rfq = RFQ(
-                        partName = partName,
-                        quantity = quantity,
-                        machine = selectedMachine,
-                        requiredBy = requiredBy
-                    )
-
-                    FirebaseRepository.saveRFQ(
-                        rfq,
-                        onSuccess = {
-                            isLoading = false
-                            Toast.makeText(context, "RFQ Posted", Toast.LENGTH_SHORT).show()
-
-                            navController.navigate("my_rfqs") {
-                                popUpTo("post_rfq") { inclusive = true }
-                            }
-                        },
-                        onFailure = {
-                            isLoading = false
-                            Toast.makeText(context, "Error: ${it.message}", Toast.LENGTH_LONG).show()
-                        }
-                    )
-                }
+                        Toast.makeText(
+                            context,
+                            "Unable to read buyer location",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
             },
             modifier = Modifier
                 .fillMaxWidth()
