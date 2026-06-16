@@ -1,6 +1,5 @@
 package com.example.cti_cart.ui.screens
 
-import android.R.style
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.layout.*
@@ -62,8 +61,6 @@ fun BuyerRFQsScreen(navController: NavController) {
                     val nearbyRfqs =
                         mutableListOf<RFQWithDistance>()
 
-                    var processedCount = 0
-
                     if (allRfqs.isEmpty()) {
                         rfqList = emptyList()
                         isLoading = false
@@ -72,74 +69,47 @@ fun BuyerRFQsScreen(navController: NavController) {
 
                     allRfqs.forEach { rfq ->
 
-                        FirebaseRepository.firestore
-                            .collection("users")
-                            .document(rfq.userId)
-                            .get()
-                            .addOnSuccessListener { buyerDoc ->
+                        val results = FloatArray(1)
 
-                                val buyerLat =
-                                    buyerDoc.getDouble("latitude") ?: 0.0
+                        android.location.Location.distanceBetween(
+                            supplierLat,
+                            supplierLng,
+                            rfq.latitude,
+                            rfq.longitude,
+                            results
+                        )
 
-                                val buyerLng =
-                                    buyerDoc.getDouble("longitude") ?: 0.0
+                        val distanceKm =
+                            results[0] / 1000.0
 
-                                val results = FloatArray(1)
+                        Log.d(
+                            "RFQ_DISTANCE",
+                            "RFQ=${rfq.partName} Distance=$distanceKm km"
+                        )
 
-                                android.location.Location.distanceBetween(
-                                    supplierLat,
-                                    supplierLng,
-                                    buyerLat,
-                                    buyerLng,
-                                    results
+                        if (distanceKm <= RFQ_RADIUS_KM) {
+
+                            nearbyRfqs.add(
+                                RFQWithDistance(
+                                    rfq = rfq,
+                                    distanceKm = distanceKm
                                 )
+                            )
 
-                                val distanceKm =
-                                    results[0] / 1000.0
-
-                                //log distance
-                                Log.d(
-                                    "RFQ_DISTANCE",
-                                    "Buyer=${rfq.userId} Distance=$distanceKm km"
-                                )
-                                if (distanceKm <= RFQ_RADIUS_KM) {
-                                    nearbyRfqs.add(
-                                        RFQWithDistance(
-                                            rfq = rfq,
-                                            distanceKm = distanceKm
-                                        )
-                                    )
-                                    Log.d(
-                                        "RFQ_DISTANCE",
-                                        "Showing RFQ ${rfq.partName} from buyer ${rfq.userId}"
-                                    )
-                                }
-
-                                processedCount++
-
-                                if (processedCount == allRfqs.size) {
-                                    Log.d(
-                                        "RFQ_DISTANCE",
-                                        "Nearby RFQs Count = ${nearbyRfqs.size}"
-                                    )
-                                    rfqList = nearbyRfqs
-                                    isLoading = false
-                                }
-                            }
-                            .addOnFailureListener {
-
-                                processedCount++
-
-                                if (processedCount == allRfqs.size) {
-                                    Log.d(
-                                        "RFQ_DISTANCE",
-                                        "Nearby RFQs Count = ${nearbyRfqs.size}"
-                                    )
-                                    rfqList = nearbyRfqs
-                                    isLoading = false
-                                }
-                            }
+                            Log.d(
+                                "RFQ_DISTANCE",
+                                "Showing RFQ ${rfq.partName}"
+                            )
+                        }
                     }
+
+                    Log.d(
+                        "RFQ_DISTANCE",
+                        "Nearby RFQs Count = ${nearbyRfqs.size}"
+                    )
+
+                    rfqList = nearbyRfqs
+                    isLoading = false
                 }
             }
             .addOnFailureListener {
