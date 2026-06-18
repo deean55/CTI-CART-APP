@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -33,6 +34,10 @@ fun BuyerRFQsScreen(navController: NavController) {
         mutableStateOf<List<RFQWithDistance>>(emptyList())
     }
     var isLoading by remember { mutableStateOf(true) }
+
+    var selectedFilter by remember {
+        mutableStateOf("ALL")
+    }
 
     LaunchedEffect(Unit) {
 
@@ -87,7 +92,7 @@ fun BuyerRFQsScreen(navController: NavController) {
                             "RFQ=${rfq.partName} Distance=$distanceKm km"
                         )
 
-                        if (distanceKm <= RFQ_RADIUS_KM) {
+                            // Load all RFQ's
 
                             nearbyRfqs.add(
                                 RFQWithDistance(
@@ -100,7 +105,7 @@ fun BuyerRFQsScreen(navController: NavController) {
                                 "RFQ_DISTANCE",
                                 "Showing RFQ ${rfq.partName}"
                             )
-                        }
+
                     }
 
                     Log.d(
@@ -116,6 +121,17 @@ fun BuyerRFQsScreen(navController: NavController) {
                 isLoading = false
             }
     }
+
+//RFQ filter
+
+    val filteredRfqs = when (selectedFilter) {
+
+        "10KM" -> rfqList.filter { it.distanceKm <= 10 }
+        "20KM" -> rfqList.filter {  it.distanceKm > 10 && it.distanceKm <= 20 }
+        "20PLUS" -> rfqList.filter { it.distanceKm > 20 }
+        else -> rfqList
+    }.sortedBy { it.distanceKm }
+
 
         Column(
             modifier = Modifier
@@ -142,6 +158,50 @@ fun BuyerRFQsScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+
+                item {
+
+                    FilterChip(
+                        selected = selectedFilter == "ALL",
+                        onClick = { selectedFilter = "ALL" },
+                        label = { Text("All RFQs") }
+                    )
+                }
+
+
+                item {
+
+                    FilterChip(
+                        selected = selectedFilter == "10KM",
+                        onClick = { selectedFilter = "10KM" },
+                        label = { Text("≤ 10 km") }
+                    )
+                }
+
+                item {
+
+                    FilterChip(
+                        selected = selectedFilter == "20KM",
+                        onClick = { selectedFilter = "20KM" },
+                        label = { Text("10-20 km") }
+                    )
+                }
+
+                item {
+
+                    FilterChip(
+                        selected = selectedFilter == "20PLUS",
+                        onClick = { selectedFilter = "20PLUS" },
+                        label = { Text("> 20 km") }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             when {
 
                 isLoading -> {
@@ -159,7 +219,7 @@ fun BuyerRFQsScreen(navController: NavController) {
                         contentPadding = PaddingValues(bottom = 80.dp)
                     ) {
 
-                        items(rfqList) { item ->
+                        items(filteredRfqs) { item ->
 
                             val rfq = item.rfq
 
