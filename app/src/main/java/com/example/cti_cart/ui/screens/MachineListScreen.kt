@@ -135,15 +135,67 @@ fun MachineRow(
         }
 
         // -------- DETAILS --------
+        // Read additional machine details
+        val machineType = machine["machineType"] as? String ?: ""
+
+        val xTravel = when (val value = machine["xTravel"]) {
+            is Long -> value.toString()
+            is Int -> value.toString()
+            else -> value?.toString() ?: ""
+        }
+
+        val yTravel = when (val value = machine["yTravel"]) {
+            is Long -> value.toString()
+            is Int -> value.toString()
+            else -> value?.toString() ?: ""
+        }
+
+        val zTravel = when (val value = machine["zTravel"]) {
+            is Long -> value.toString()
+            is Int -> value.toString()
+            else -> value?.toString() ?: ""
+        }
+
+        val spindleTaper = machine["spindleTaper"] as? String ?: ""
+        val controlSystem = machine["controlSystem"] as? String ?: ""
+        val axisCount = machine["axisCount"] as? String ?: ""
+
         Column(
             modifier = Modifier
                 .weight(1f)
                 .border(1.dp, MaterialTheme.colorScheme.outline)
                 .padding(8.dp)
         ) {
-            Text("Machine Name: $name")
-            Text("Hourly Rate: $rate")
-            Text("Utilization: $utilization%")
+
+            Text(
+                text = name,
+                style = MaterialTheme.typography.titleSmall
+            )
+
+            Text(
+                text = machineType,
+                style = MaterialTheme.typography.bodySmall
+            )
+
+            Text(
+                text = "Travel: ${xTravel} × ${yTravel} × ${zTravel} mm",
+                style = MaterialTheme.typography.bodySmall
+            )
+
+            Text(
+                text = "$spindleTaper | $controlSystem | $axisCount",
+                style = MaterialTheme.typography.bodySmall
+            )
+
+            Text(
+                text = "₹$rate / hr",
+                style = MaterialTheme.typography.bodySmall
+            )
+
+            Text(
+                text = "Utilization: $utilization%",
+                style = MaterialTheme.typography.bodySmall
+            )
         }
 
         // -------- EDIT BUTTON --------

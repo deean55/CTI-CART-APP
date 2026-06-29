@@ -1,5 +1,6 @@
 package com.example.cti_cart.ui.screens
 
+import android.content.Context
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -35,6 +36,19 @@ fun AddMachineScreen(
     var hourlyRate by remember { mutableStateOf("") }
     var utilization by remember { mutableStateOf("") }
 
+    // Basic Details
+    var machineType by remember { mutableStateOf("") }
+
+// Travel Size
+    var xTravel by remember { mutableStateOf("") }
+    var yTravel by remember { mutableStateOf("") }
+    var zTravel by remember { mutableStateOf("") }
+
+// Dropdowns
+    var spindleTaper by remember { mutableStateOf("BT40") }
+    var controlSystem by remember { mutableStateOf("Fanuc") }
+    var axisCount by remember { mutableStateOf("3 Axis") }
+
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var existingImageUrl by remember { mutableStateOf<String?>(null) }
 
@@ -56,6 +70,16 @@ fun AddMachineScreen(
                     machineName = it.getString("name") ?: ""
                     hourlyRate = it.getString("hourlyRate") ?: ""
                     utilization = it.getString("utilization") ?: ""
+
+                    machineType = it.getString("machineType") ?: ""
+
+                    xTravel = (it.getLong("xTravel") ?: 0L).toString()
+                    yTravel = (it.getLong("yTravel") ?: 0L).toString()
+                    zTravel = (it.getLong("zTravel") ?: 0L).toString()
+
+                    spindleTaper = it.getString("spindleTaper") ?: "BT40"
+                    controlSystem = it.getString("controlSystem") ?: "Fanuc"
+                    axisCount = it.getString("axisCount") ?: "3 Axis"
 
                     existingImageUrl =
                         it.getString("imageUrl")
@@ -120,6 +144,98 @@ fun AddMachineScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        OutlinedTextField(
+            value = machineType,
+            onValueChange = { machineType = it },
+            label = { Text("Machine Type") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = xTravel,
+            onValueChange = { xTravel = it },
+            label = { Text("X Travel (mm)") },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = yTravel,
+            onValueChange = { yTravel = it },
+            label = { Text("Y Travel (mm)") },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = zTravel,
+            onValueChange = { zTravel = it },
+            label = { Text("Z Travel (mm)") },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        OutlinedTextField(
+            value = spindleTaper,
+            onValueChange = { spindleTaper = it },
+            label = { Text("Spindle Taper") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        OutlinedTextField(
+            value = controlSystem,
+            onValueChange = { controlSystem = it },
+            label = { Text("Control System") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        OutlinedTextField(
+            value = axisCount,
+            onValueChange = { axisCount = it },
+            label = { Text("Axis Count") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        val spindleTaperOptions = listOf(
+            "BT30",
+            "BT40",
+            "BT50",
+            "CAT40",
+            "CAT50",
+            "HSK63",
+            "HSK100"
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        val controlSystemOptions = listOf(
+            "Fanuc",
+            "Siemens",
+            "Mitsubishi",
+            "Heidenhain",
+            "Mazatrol",
+            "Fagor",
+            "Haas",
+            "Syntec",
+            "Other"
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        val axisCountOptions = listOf(
+            "2 Axis",
+            "3 Axis",
+            "4 Axis",
+            "5 Axis",
+            "6 Axis"
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
         // -------- IMAGE BUTTON --------
 
         Button(
@@ -182,7 +298,25 @@ fun AddMachineScreen(
                             uri = imageUri!!,
                             onSuccess = { newUrl ->
 
-                                updateMachine(machineId!!, machineName, hourlyRate, utilization, newUrl, context) {
+                                updateMachine(
+                                    machineId = machineId!!,
+                                    name = machineName,
+                                    rate = hourlyRate,
+                                    utilization = utilization,
+
+                                    machineType = machineType,
+
+                                    xTravel = xTravel,
+                                    yTravel = yTravel,
+                                    zTravel = zTravel,
+
+                                    spindleTaper = spindleTaper,
+                                    controlSystem = controlSystem,
+                                    axisCount = axisCount,
+
+                                    imageUrl = existingImageUrl,
+                                    context = context
+                                ) {
                                     isLoading = false
                                     Toast.makeText(
                                         context,
@@ -197,7 +331,25 @@ fun AddMachineScreen(
                         )
                     } else {
                         // No new image → keep old
-                        updateMachine(machineId!!, machineName, hourlyRate, utilization, existingImageUrl, context) {
+                        updateMachine(
+                            machineId = machineId!!,
+                            name = machineName,
+                            rate = hourlyRate,
+                            utilization = utilization,
+
+                            machineType = machineType,
+
+                            xTravel = xTravel,
+                            yTravel = yTravel,
+                            zTravel = zTravel,
+
+                            spindleTaper = spindleTaper,
+                            controlSystem = controlSystem,
+                            axisCount = axisCount,
+
+                            imageUrl = existingImageUrl,
+                            context = context
+                        )  {
                             isLoading = false
                             Toast.makeText(context, "Machine Updated", Toast.LENGTH_SHORT).show()
                         }
@@ -215,6 +367,17 @@ fun AddMachineScreen(
                         name = machineName,
                         rate = hourlyRate,
                         utilization = utilization,
+
+                        machineType = machineType,
+
+                        xTravel = xTravel,
+                        yTravel = yTravel,
+                        zTravel = zTravel,
+
+                        spindleTaper = spindleTaper,
+                        controlSystem = controlSystem,
+                        axisCount = axisCount,
+
                         imageUri = imageUri!!,
                         onSuccess = {
                             isLoading = false
@@ -261,15 +424,36 @@ fun updateMachine(
     name: String,
     rate: String,
     utilization: String,
+
+    machineType: String,
+
+    xTravel: String,
+    yTravel: String,
+    zTravel: String,
+
+    spindleTaper: String,
+    controlSystem: String,
+    axisCount: String,
+
     imageUrl: String?,
-    context: android.content.Context,
+    context: Context,
     onDone: () -> Unit
 ) {
 
     val data = mutableMapOf<String, Any>(
         "name" to name,
         "hourlyRate" to rate,
-        "utilization" to utilization
+        "utilization" to utilization,
+
+        "machineType" to machineType,
+
+        "xTravel" to (xTravel.toIntOrNull() ?: 0),
+        "yTravel" to (yTravel.toIntOrNull() ?: 0),
+        "zTravel" to (zTravel.toIntOrNull() ?: 0),
+
+        "spindleTaper" to spindleTaper,
+        "controlSystem" to controlSystem,
+        "axisCount" to axisCount
     )
 
     imageUrl?.let {

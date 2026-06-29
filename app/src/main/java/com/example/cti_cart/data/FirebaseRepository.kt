@@ -148,29 +148,65 @@ object FirebaseRepository {
         name: String,
         rate: String,
         utilization: String,
+        machineType: String,
+        xTravel: String,
+        yTravel: String,
+        zTravel: String,
+        spindleTaper: String,
+        controlSystem: String,
+        axisCount: String,
         imageUri: Uri,
         onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
+        onFailure: (Exception?) -> Unit
     ) {
+        val userId = auth.currentUser?.uid
+
+        if (userId == null) {
+            onFailure(Exception("User not logged in"))
+            return
+        }
+
         uploadImage(
             uri = imageUri,
             onSuccess = { imageUrl ->
 
-                val data = mapOf(
+                val machineData = hashMapOf(
+                    "supplierId" to userId,
                     "name" to name,
                     "hourlyRate" to rate,
                     "utilization" to utilization,
+
+                    "machineType" to machineType,
+
+                    "xTravel" to (xTravel.toIntOrNull() ?: 0),
+                    "yTravel" to (yTravel.toIntOrNull() ?: 0),
+                    "zTravel" to (zTravel.toIntOrNull() ?: 0),
+
+                    "spindleTaper" to spindleTaper,
+                    "controlSystem" to controlSystem,
+                    "axisCount" to axisCount,
+
                     "imageUrl" to imageUrl,
-                    "images" to listOf(imageUrl)
+                    "images" to listOf(imageUrl),
+
+                    "createdAt" to System.currentTimeMillis()
                 )
 
-                addMachine(
-                    data = data,
-                    onSuccess = onSuccess,
-                    onFailure = onFailure
-                )
+                firestore.collection("machines")
+                    .add(machineData)
+                    .addOnSuccessListener { doc ->
+
+                        doc.update("id", doc.id)
+
+                        onSuccess()
+                    }
+                    .addOnFailureListener {
+                        onFailure(it)
+                    }
             },
-            onFailure = onFailure
+            onFailure = {
+                onFailure(it)
+            }
         )
     }
 
