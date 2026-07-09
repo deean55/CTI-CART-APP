@@ -1,4 +1,5 @@
 package com.example.cti_cart.ui.screens
+import com.example.cti_cart.ui.machineforms.HMCForm
 
 import android.content.Context
 import android.net.Uri
@@ -23,7 +24,9 @@ import com.example.cti_cart.data.FirebaseRepository
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import com.example.cti_cart.ui.machineforms.VMCForm
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddMachineScreen(
     navController: NavController,
@@ -38,6 +41,25 @@ fun AddMachineScreen(
 
     // Basic Details
     var machineType by remember { mutableStateOf("") }
+
+    var machineTypeExpanded by remember { mutableStateOf(false) }
+
+    val machineTypes = listOf(
+        "VMC",
+        "HMC",
+        "CNC Turning Center",
+        "VTL",
+        "Double Column VMC",
+        "Horizontal Boring Machine"
+    )
+    //HMC Variables
+    var palletSize by remember { mutableStateOf("") }
+
+    var numberOfPallets by remember { mutableStateOf("") }
+
+    var bAxis by remember { mutableStateOf(false) }
+
+    var bAxisDegree by remember { mutableStateOf("") }
 
 // Travel Size
     var xTravel by remember { mutableStateOf("") }
@@ -144,67 +166,125 @@ fun AddMachineScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(
-            value = machineType,
-            onValueChange = { machineType = it },
-            label = { Text("Machine Type") },
-            modifier = Modifier.fillMaxWidth()
-        )
+        ExposedDropdownMenuBox(
+            expanded = machineTypeExpanded,
+            onExpandedChange = {
+                machineTypeExpanded = !machineTypeExpanded
+            }
+        ) {
 
-        OutlinedTextField(
-            value = xTravel,
-            onValueChange = { xTravel = it },
-            label = { Text("X Travel (mm)") },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number
-            ),
-            modifier = Modifier.fillMaxWidth()
-        )
+            OutlinedTextField(
+                value = machineType,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Machine Type") },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(
+                        expanded = machineTypeExpanded
+                    )
+                },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+            )
 
-        OutlinedTextField(
-            value = yTravel,
-            onValueChange = { yTravel = it },
-            label = { Text("Y Travel (mm)") },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number
-            ),
-            modifier = Modifier.fillMaxWidth()
-        )
+            ExposedDropdownMenu(
+                expanded = machineTypeExpanded,
+                onDismissRequest = {
+                    machineTypeExpanded = false
+                }
+            ) {
 
-        OutlinedTextField(
-            value = zTravel,
-            onValueChange = { zTravel = it },
-            label = { Text("Z Travel (mm)") },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number
-            ),
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        OutlinedTextField(
-            value = spindleTaper,
-            onValueChange = { spindleTaper = it },
-            label = { Text("Spindle Taper") },
-            modifier = Modifier.fillMaxWidth()
-        )
+                machineTypes.forEach { type ->
 
-        Spacer(modifier = Modifier.height(10.dp))
+                    DropdownMenuItem(
+                        text = { Text(type) },
+                        onClick = {
+                            machineType = type
+                            machineTypeExpanded = false
+                        }
+                    )
+                }
+            }
+        }
 
-        OutlinedTextField(
-            value = controlSystem,
-            onValueChange = { controlSystem = it },
-            label = { Text("Control System") },
-            modifier = Modifier.fillMaxWidth()
-        )
+        when (machineType) {
 
-        Spacer(modifier = Modifier.height(10.dp))
+            "VMC" -> {
 
-        OutlinedTextField(
-            value = axisCount,
-            onValueChange = { axisCount = it },
-            label = { Text("Axis Count") },
-            modifier = Modifier.fillMaxWidth()
-        )
+                VMCForm(
+                    xTravel = xTravel,
+                    onXTravelChange = { xTravel = it },
+
+                    yTravel = yTravel,
+                    onYTravelChange = { yTravel = it },
+
+                    zTravel = zTravel,
+                    onZTravelChange = { zTravel = it },
+
+                    spindleTaper = spindleTaper,
+                    onSpindleTaperChange = { spindleTaper = it },
+
+                    controlSystem = controlSystem,
+                    onControlSystemChange = { controlSystem = it },
+
+                    axisCount = axisCount,
+                    onAxisCountChange = { axisCount = it }
+                )
+            }
+
+            "HMC" -> {
+
+                HMCForm(
+
+                    xTravel = xTravel,
+                    onXTravelChange = { xTravel = it },
+
+                    yTravel = yTravel,
+                    onYTravelChange = { yTravel = it },
+
+                    zTravel = zTravel,
+                    onZTravelChange = { zTravel = it },
+
+                    spindleTaper = spindleTaper,
+                    onSpindleTaperChange = { spindleTaper = it },
+
+                    controlSystem = controlSystem,
+                    onControlSystemChange = { controlSystem = it },
+
+                    axisCount = axisCount,
+                    onAxisCountChange = { axisCount = it },
+
+                    palletSize = palletSize,
+                    onPalletSizeChange = { palletSize = it },
+
+                    numberOfPallets = numberOfPallets,
+                    onNumberOfPalletsChange = { numberOfPallets = it },
+
+                    bAxis = bAxis,
+                    onBAxisChange = { bAxis = it },
+
+                    bAxisDegree = bAxisDegree,
+                    onBAxisDegreeChange = { bAxisDegree = it }
+                )
+            }
+
+            "CNC Turning Center" -> {
+                Text("Turning Center Form Coming Soon")
+            }
+
+            "VTL" -> {
+                Text("VTL Form Coming Soon")
+            }
+
+            "Double Column VMC" -> {
+                Text("Double Column VMC Form Coming Soon")
+            }
+
+            "Horizontal Boring Machine" -> {
+                Text("Horizontal Boring Machine Form Coming Soon")
+            }
+        }
         val spindleTaperOptions = listOf(
             "BT30",
             "BT40",
@@ -284,6 +364,16 @@ fun AddMachineScreen(
 
                 if (machineName.isBlank() || hourlyRate.isBlank() || utilization.isBlank()) {
                     Toast.makeText(context, "Fill all fields", Toast.LENGTH_SHORT).show()
+                    return@Button
+                }
+                //SUBMIT without selecting a machine type checking
+
+                if (machineType.isBlank()) {
+                    Toast.makeText(
+                        context,
+                        "Please select a Machine Type",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     return@Button
                 }
 
