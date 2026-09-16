@@ -1,5 +1,6 @@
 package com.example.cti_cart.ui.screens
 import com.example.cti_cart.ui.machineforms.HMCForm
+import com.example.cti_cart.ui.machineforms.TurningCentreForm
 
 import android.content.Context
 import android.net.Uri
@@ -61,6 +62,17 @@ fun AddMachineScreen(
 
     var bAxisDegree by remember { mutableStateOf("") }
 
+    // TURNING CENTRE Variables
+    var maxTurningDiameter by remember { mutableStateOf("") }
+
+    var maxTurningLength by remember { mutableStateOf("") }
+
+    var chuckSize by remember { mutableStateOf("") }
+
+    var spindleBore by remember { mutableStateOf("") }
+
+    var spindleSpeed by remember { mutableStateOf("") }
+
 // Travel Size
     var xTravel by remember { mutableStateOf("") }
     var yTravel by remember { mutableStateOf("") }
@@ -102,6 +114,30 @@ fun AddMachineScreen(
                     spindleTaper = it.getString("spindleTaper") ?: "BT40"
                     controlSystem = it.getString("controlSystem") ?: "Fanuc"
                     axisCount = it.getString("axisCount") ?: "3 Axis"
+
+                    palletSize = (it.getLong("palletSize") ?: 0L).toString()
+
+                    numberOfPallets = (it.getLong("numberOfPallets") ?: 0L).toString()
+
+                    bAxis = it.getBoolean("bAxis") ?: false
+
+                    bAxisDegree = it.getString("bAxisDegree") ?: ""
+
+                    // TURNING CENTRE
+                    maxTurningDiameter =
+                        (it.getLong("maxTurningDiameter") ?: 0L).toString()
+
+                    maxTurningLength =
+                        (it.getLong("maxTurningLength") ?: 0L).toString()
+
+                    chuckSize =
+                        (it.getLong("chuckSize") ?: 0L).toString()
+
+                    spindleBore =
+                        (it.getLong("spindleBore") ?: 0L).toString()
+
+                    spindleSpeed =
+                        (it.getLong("spindleSpeed") ?: 0L).toString()
 
                     existingImageUrl =
                         it.getString("imageUrl")
@@ -266,11 +302,54 @@ fun AddMachineScreen(
 
                     bAxisDegree = bAxisDegree,
                     onBAxisDegreeChange = { bAxisDegree = it }
+
                 )
             }
 
             "CNC Turning Center" -> {
-                Text("Turning Center Form Coming Soon")
+
+                TurningCentreForm(
+
+                    xTravel = xTravel,
+                    onXTravelChange = { xTravel = it },
+
+                    zTravel = zTravel,
+                    onZTravelChange = { zTravel = it },
+
+                    spindleTaper = spindleTaper,
+                    onSpindleTaperChange = { spindleTaper = it },
+
+                    controlSystem = controlSystem,
+                    onControlSystemChange = { controlSystem = it },
+
+                    axisCount = axisCount,
+                    onAxisCountChange = { axisCount = it },
+
+                    maxTurningDiameter = maxTurningDiameter,
+                    onMaxTurningDiameterChange = {
+                        maxTurningDiameter = it
+                    },
+
+                    maxTurningLength = maxTurningLength,
+                    onMaxTurningLengthChange = {
+                        maxTurningLength = it
+                    },
+
+                    chuckSize = chuckSize,
+                    onChuckSizeChange = {
+                        chuckSize = it
+                    },
+
+                    spindleBore = spindleBore,
+                    onSpindleBoreChange = {
+                        spindleBore = it
+                    },
+
+                    spindleSpeed = spindleSpeed,
+                    onSpindleSpeedChange = {
+                        spindleSpeed = it
+                    }
+                )
             }
 
             "VTL" -> {
@@ -400,11 +479,25 @@ fun AddMachineScreen(
                                     yTravel = yTravel,
                                     zTravel = zTravel,
 
+
                                     spindleTaper = spindleTaper,
                                     controlSystem = controlSystem,
                                     axisCount = axisCount,
 
-                                    imageUrl = existingImageUrl,
+                                    // HMC
+                                    palletSize = palletSize,
+                                    numberOfPallets = numberOfPallets,
+                                    bAxis = bAxis,
+                                    bAxisDegree = bAxisDegree,
+
+                                    imageUrl = newUrl,
+
+                                    // TURNING CENTRE
+                                    maxTurningDiameter = maxTurningDiameter,
+                                    maxTurningLength = maxTurningLength,
+                                    chuckSize = chuckSize,
+                                    spindleBore = spindleBore,
+                                    spindleSpeed = spindleSpeed,
                                     context = context
                                 ) {
                                     isLoading = false
@@ -437,7 +530,20 @@ fun AddMachineScreen(
                             controlSystem = controlSystem,
                             axisCount = axisCount,
 
+                            // HMC
+                            palletSize = palletSize,
+                            numberOfPallets = numberOfPallets,
+                            bAxis = bAxis,
+                            bAxisDegree = bAxisDegree,
+
                             imageUrl = existingImageUrl,
+
+                            // TURNING CENTRE
+                            maxTurningDiameter = maxTurningDiameter,
+                            maxTurningLength = maxTurningLength,
+                            chuckSize = chuckSize,
+                            spindleBore = spindleBore,
+                            spindleSpeed = spindleSpeed,
                             context = context
                         )  {
                             isLoading = false
@@ -467,6 +573,19 @@ fun AddMachineScreen(
                         spindleTaper = spindleTaper,
                         controlSystem = controlSystem,
                         axisCount = axisCount,
+
+                        // HMC
+                        palletSize = palletSize,
+                        numberOfPallets = numberOfPallets,
+                        bAxis = bAxis,
+                        bAxisDegree = bAxisDegree,
+
+                        // TURNING CENTRE
+                        maxTurningDiameter = maxTurningDiameter,
+                        maxTurningLength = maxTurningLength,
+                        chuckSize = chuckSize,
+                        spindleBore = spindleBore,
+                        spindleSpeed = spindleSpeed,
 
                         imageUri = imageUri!!,
                         onSuccess = {
@@ -525,9 +644,24 @@ fun updateMachine(
     controlSystem: String,
     axisCount: String,
 
+    // HMC
+    palletSize: String,
+    numberOfPallets: String,
+    bAxis: Boolean,
+    bAxisDegree: String,
+
+    // TURNING CENTRE
+    maxTurningDiameter: String,
+    maxTurningLength: String,
+    chuckSize: String,
+    spindleBore: String,
+    spindleSpeed: String,
+
     imageUrl: String?,
     context: Context,
     onDone: () -> Unit
+
+
 ) {
 
     val data = mutableMapOf<String, Any>(
@@ -536,11 +670,25 @@ fun updateMachine(
         "utilization" to utilization,
 
         "machineType" to machineType,
-
+        // Common Travel
         "xTravel" to (xTravel.toIntOrNull() ?: 0),
         "yTravel" to (yTravel.toIntOrNull() ?: 0),
         "zTravel" to (zTravel.toIntOrNull() ?: 0),
 
+        // HMC
+        "palletSize" to (palletSize.toIntOrNull() ?: 0),
+        "numberOfPallets" to (numberOfPallets.toIntOrNull() ?: 0),
+        "bAxis" to bAxis,
+        "bAxisDegree" to bAxisDegree,
+
+        // TURNING CENTRE
+        "maxTurningDiameter" to (maxTurningDiameter.toIntOrNull() ?: 0),
+        "maxTurningLength" to (maxTurningLength.toIntOrNull() ?: 0),
+        "chuckSize" to (chuckSize.toIntOrNull() ?: 0),
+        "spindleBore" to (spindleBore.toIntOrNull() ?: 0),
+        "spindleSpeed" to (spindleSpeed.toIntOrNull() ?: 0),
+
+        // Common
         "spindleTaper" to spindleTaper,
         "controlSystem" to controlSystem,
         "axisCount" to axisCount

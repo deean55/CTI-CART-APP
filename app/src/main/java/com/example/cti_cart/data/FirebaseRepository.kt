@@ -148,13 +148,30 @@ object FirebaseRepository {
         name: String,
         rate: String,
         utilization: String,
+
         machineType: String,
+
         xTravel: String,
         yTravel: String,
         zTravel: String,
+
         spindleTaper: String,
         controlSystem: String,
         axisCount: String,
+
+        // HMC
+        palletSize: String,
+        numberOfPallets: String,
+        bAxis: Boolean,
+        bAxisDegree: String,
+
+        // TURNING CENTRE
+        maxTurningDiameter: String,
+        maxTurningLength: String,
+        chuckSize: String,
+        spindleBore: String,
+        spindleSpeed: String,
+
         imageUri: Uri,
         onSuccess: () -> Unit,
         onFailure: (Exception?) -> Unit
@@ -178,13 +195,26 @@ object FirebaseRepository {
 
                     "machineType" to machineType,
 
+                    // Common Travel
                     "xTravel" to (xTravel.toIntOrNull() ?: 0),
                     "yTravel" to (yTravel.toIntOrNull() ?: 0),
                     "zTravel" to (zTravel.toIntOrNull() ?: 0),
-
+                    //Common
                     "spindleTaper" to spindleTaper,
                     "controlSystem" to controlSystem,
                     "axisCount" to axisCount,
+                    // HMC
+                    "palletSize" to (palletSize.toIntOrNull() ?: 0),
+                    "numberOfPallets" to (numberOfPallets.toIntOrNull() ?: 0),
+                    "bAxis" to bAxis,
+                    "bAxisDegree" to bAxisDegree,
+
+                    // TURNING CENTRE
+                    "maxTurningDiameter" to (maxTurningDiameter.toIntOrNull() ?: 0),
+                    "maxTurningLength" to (maxTurningLength.toIntOrNull() ?: 0),
+                    "chuckSize" to (chuckSize.toIntOrNull() ?: 0),
+                    "spindleBore" to (spindleBore.toIntOrNull() ?: 0),
+                    "spindleSpeed" to (spindleSpeed.toIntOrNull() ?: 0),
 
                     "imageUrl" to imageUrl,
                     "images" to listOf(imageUrl),

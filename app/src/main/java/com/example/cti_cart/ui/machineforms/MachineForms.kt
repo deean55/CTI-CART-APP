@@ -207,3 +207,162 @@ fun HMCForm(
         modifier = Modifier.fillMaxWidth()
     )
 }
+
+// TURNING CENTRE / CNC LATHE FORM
+
+@Composable
+fun TurningCentreForm(
+    xTravel: String,
+    onXTravelChange: (String) -> Unit,
+
+    zTravel: String,
+    onZTravelChange: (String) -> Unit,
+
+    spindleTaper: String,
+    onSpindleTaperChange: (String) -> Unit,
+
+    controlSystem: String,
+    onControlSystemChange: (String) -> Unit,
+
+    axisCount: String,
+    onAxisCountChange: (String) -> Unit,
+
+    maxTurningDiameter: String,
+    onMaxTurningDiameterChange: (String) -> Unit,
+
+    maxTurningLength: String,
+    onMaxTurningLengthChange: (String) -> Unit,
+
+    chuckSize: String,
+    onChuckSizeChange: (String) -> Unit,
+
+    spindleBore: String,
+    onSpindleBoreChange: (String) -> Unit,
+
+    spindleSpeed: String,
+    onSpindleSpeedChange: (String) -> Unit
+) {
+
+    Text(
+        text = "Turning Centre",
+        style = MaterialTheme.typography.titleMedium
+    )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    OutlinedTextField(
+        value = xTravel,
+        onValueChange = onXTravelChange,
+        label = { Text("X Travel (mm)") },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number
+        ),
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    OutlinedTextField(
+        value = zTravel,
+        onValueChange = onZTravelChange,
+        label = { Text("Z Travel (mm)") },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number
+        ),
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    OutlinedTextField(
+        value = spindleTaper,
+        onValueChange = onSpindleTaperChange,
+        label = { Text("Spindle Taper") },
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    OutlinedTextField(
+        value = controlSystem,
+        onValueChange = onControlSystemChange,
+        label = { Text("Control System") },
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    OutlinedTextField(
+        value = axisCount,
+        onValueChange = onAxisCountChange,
+        label = { Text("Axis Count") },
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    Spacer(modifier = Modifier.height(20.dp))
+
+    Text(
+        text = "Turning Centre Specific",
+        style = MaterialTheme.typography.titleMedium
+    )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    OutlinedTextField(
+        value = maxTurningDiameter,
+        onValueChange = onMaxTurningDiameterChange,
+        label = { Text("Max Turning Diameter (mm)") },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number
+        ),
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    OutlinedTextField(
+        value = maxTurningLength,
+        onValueChange = onMaxTurningLengthChange,
+        label = { Text("Max Turning Length (mm)") },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number
+        ),
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    OutlinedTextField(
+        value = chuckSize,
+        onValueChange = onChuckSizeChange,
+        label = { Text("Chuck Size (inch)") },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number
+        ),
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    OutlinedTextField(
+        value = spindleBore,
+        onValueChange = onSpindleBoreChange,
+        label = { Text("Spindle Bore (mm)") },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number
+        ),
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    OutlinedTextField(
+        value = spindleSpeed,
+        onValueChange = onSpindleSpeedChange,
+        label = { Text("Max Spindle Speed (RPM)") },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number
+        ),
+        modifier = Modifier.fillMaxWidth()
+    )
+}
