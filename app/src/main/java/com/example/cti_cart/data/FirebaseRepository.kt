@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.cti_cart.data.model.RFQ
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
@@ -267,6 +268,127 @@ object FirebaseRepository {
             .addOnFailureListener {
                 it.printStackTrace()
                 onFailure(it)
+            }
+    }
+
+
+    // -------------------- SAVE QUOTE --------------------
+
+    fun saveQuote(
+        quoteData: Map<String, Any>,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val supplierId = auth.currentUser?.uid
+
+        if (supplierId == null) {
+            onFailure(Exception("User not logged in"))
+            return
+        }
+
+        val docRef = firestore.collection("quotes").document()
+        val quote = quoteData.toMutableMap().apply {
+            put("id", docRef.id)
+            put("supplierId", supplierId)
+        }
+
+        docRef.set(quote)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener {
+                it.printStackTrace()
+                onFailure(it)
+            }
+    }
+
+    // -------------------- GET QUOTES FOR BUYER RFQ --------------------
+
+    fun getQuotesForRFQ(
+        rfqId: String,
+        onResult: (List<com.example.cti_cart.data.model.Quote>) -> Unit,
+        onFailure: (Exception) -> Unit = { onResult(emptyList()) }
+    ) {
+        val buyerId = auth.currentUser?.uid
+
+        if (buyerId == null) {
+            onFailure(Exception("User not logged in"))
+            return
+        }
+
+        // Buyer can only query quotes belonging to their own RFQ.
+        // This also satisfies the Firestore security rule:
+        // buyerId == request.auth.uid
+        firestore.collection("quotes")
+            .whereEqualTo("rfqId", rfqId)
+            .whereEqualTo("buyerId", buyerId)
+            .get()
+            .addOnSuccessListener { result ->
+                val quotes = result.documents.mapNotNull { document ->
+                    document.toObject(com.example.cti_cart.data.model.Quote::class.java)?.copy(
+                        id = document.id
+                    )
+                }.sortedByDescending { it.createdAt }
+
+                onResult(quotes)
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                onFailure(it)
+            }
+    }
+
+    // -------------------- UPDATE QUOTE STATUS --------------------
+
+    fun updateQuoteStatus(
+        quoteId: String,
+        status: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        firestore.collection("quotes")
+            .document(quoteId)
+            .update(
+                mapOf(
+                    "status" to status,
+                    "updatedAt" to System.currentTimeMillis()
+                )
+            )
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener {
+                it.printStackTrace()
+                onFailure(it)
+            }
+    }
+
+    // -------------------- GET MY QUOTES (REAL-TIME) --------------------
+
+    fun listenToMyQuotes(
+        onResult: (List<com.example.cti_cart.data.model.Quote>) -> Unit,
+        onFailure: (Exception) -> Unit = {}
+    ): ListenerRegistration? {
+        val supplierId = auth.currentUser?.uid
+
+        if (supplierId == null) {
+            onFailure(Exception("User not logged in"))
+            onResult(emptyList())
+            return null
+        }
+
+        return firestore.collection("quotes")
+            .whereEqualTo("supplierId", supplierId)
+            .addSnapshotListener { result, error ->
+                if (error != null) {
+                    error.printStackTrace()
+                    onFailure(error)
+                    return@addSnapshotListener
+                }
+
+                val quotes = result?.documents?.mapNotNull { document ->
+                    document.toObject(com.example.cti_cart.data.model.Quote::class.java)?.copy(
+                        id = document.id
+                    )
+                }?.sortedByDescending { it.createdAt } ?: emptyList()
+
+                onResult(quotes)
             }
     }
 

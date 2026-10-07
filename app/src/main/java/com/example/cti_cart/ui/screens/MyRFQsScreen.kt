@@ -118,6 +118,18 @@ fun RFQCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // View Quotes
+            OutlinedButton(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    navController.navigate("rfq_quotes/${Uri.encode(rfq.id)}")
+                }
+            ) {
+                Text("View Quotes")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             // 🔥 View Drawing (IN-APP)
             if (rfq.fileUrl.isNotEmpty()) {
                 Button(

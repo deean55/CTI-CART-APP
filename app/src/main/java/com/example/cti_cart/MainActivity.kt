@@ -22,6 +22,9 @@ import com.example.cti_cart.ui.screens.BuyerRFQsScreen
 import com.example.cti_cart.ui.screens.DrawingViewerScreen
 import com.example.cti_cart.ui.screens.MapPickerScreen
 import com.example.cti_cart.ui.screens.MyRFQsScreen
+import com.example.cti_cart.ui.screens.MyQuotesScreen
+import com.example.cti_cart.ui.screens.NewQuoteScreen
+import com.example.cti_cart.ui.screens.QuotesForRFQScreen
 import com.example.cti_cart.ui.screens.PostRFQScreen
 import com.example.cti_cart.ui.screens.SupplierDashboardScreen
 
@@ -86,8 +89,25 @@ class MainActivity : ComponentActivity() {
                 composable("my_rfqs") {
                     MyRFQsScreen(navController)
                 }
+                composable("my_quotes") {
+                    MyQuotesScreen(navController)
+                }
                 composable("buyer_rfqs") {
                     BuyerRFQsScreen(navController)
+                }
+                composable("new_quote/{rfqId}") { backStackEntry ->
+                    val rfqId = backStackEntry.arguments?.getString("rfqId") ?: ""
+                    NewQuoteScreen(
+                        navController = navController,
+                        rfqId = rfqId
+                    )
+                }
+                composable("rfq_quotes/{rfqId}") { backStackEntry ->
+                    val rfqId = backStackEntry.arguments?.getString("rfqId") ?: ""
+                    QuotesForRFQScreen(
+                        navController = navController,
+                        rfqId = rfqId
+                    )
                 }
                 composable("map_picker") {
                     MapPickerScreen(navController)

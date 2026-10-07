@@ -171,6 +171,23 @@ fun SupplierDashboardScreen(navController: NavController) {
             }
 
             DashboardCard(
+                title = "My Quotes",
+                icon = Icons.Default.RequestQuote,
+                color = Color(0xFF1565C0),
+                modifier = Modifier.weight(1f)
+            ) {
+                navController.navigate("my_quotes")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // THIRD ROW
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            DashboardCard(
                 title = if (showHistory) "History ▲" else "History ▼",
                 icon = Icons.Default.History,
                 color = Color(0xFFF57C00),
@@ -178,6 +195,8 @@ fun SupplierDashboardScreen(navController: NavController) {
             ) {
                 showHistory = !showHistory
             }
+
+            Spacer(modifier = Modifier.weight(1f))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
