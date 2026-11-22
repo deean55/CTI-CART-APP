@@ -230,7 +230,11 @@ fun PostRFQScreen(navController: NavController) {
                                             ).show()
 
                                             navController.navigate("my_rfqs") {
-                                                popUpTo("post_rfq") {
+                                                popUpTo(
+                                                    navController.currentBackStackEntry
+                                                        ?.destination
+                                                        ?.route ?: "post_job"
+                                                ) {
                                                     inclusive = true
                                                 }
                                             }
@@ -280,7 +284,11 @@ fun PostRFQScreen(navController: NavController) {
                                     ).show()
 
                                     navController.navigate("my_rfqs") {
-                                        popUpTo("post_rfq") {
+                                        popUpTo(
+                                            navController.currentBackStackEntry
+                                                ?.destination
+                                                ?.route ?: "post_job"
+                                        ) {
                                             inclusive = true
                                         }
                                     }

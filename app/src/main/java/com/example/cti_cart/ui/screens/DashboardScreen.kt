@@ -1,5 +1,8 @@
 package com.example.cti_cart.ui.screens
 
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,9 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 
 fun logout(navController: NavController) {
     FirebaseRepository.auth.signOut()
-    navController.navigate("welcome") {
-        popUpTo("dashboard") { inclusive = true }
-    }
+    clearStackAndNavigate(navController, "welcome")
 }
 
 // 🔥 UPDATED HEADER WITH USERNAME
@@ -69,9 +70,7 @@ fun DashboardHeader(
             Row {
                 if (showSwitch) {
                     TextButton(onClick = {
-                        navController.navigate("role_selection") {
-                            popUpTo("dashboard") { inclusive = true }
-                        }
+                        clearStackAndNavigate(navController, "role")
                     }) {
                         Text("Switch")
                     }
@@ -274,6 +273,11 @@ fun DashboardCard(
 @Composable
 fun BuyerDashboardScreen(navController: NavController) {
 
+    val context = LocalContext.current
+    val comingSoon: (String) -> Unit = { feature ->
+        Toast.makeText(context, "$feature is coming soon", Toast.LENGTH_SHORT).show()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -303,21 +307,21 @@ fun BuyerDashboardScreen(navController: NavController) {
         TwoCardRow(
             "Orders",
             Color(0xFFF57C00),
-            { navController.navigate("buyer_orders") },
+            { comingSoon("Orders") },
 
             "Saved Suppliers",
             Color(0xFF7B1FA2),
-            { navController.navigate("saved_suppliers") }
+            { comingSoon("Saved Suppliers") }
         )
 
         TwoCardRow(
             "Browse Suppliers",
             Color(0xFFD32F2F),
-            { navController.navigate("browse_suppliers") },
+            { comingSoon("Browse Suppliers") },
 
             "Messages",
             Color(0xFF455A64),
-            { navController.navigate("chat_list") }
+            { comingSoon("Messages") }
         )
     }
 }

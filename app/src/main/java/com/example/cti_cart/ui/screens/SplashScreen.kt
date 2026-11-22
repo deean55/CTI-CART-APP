@@ -33,9 +33,7 @@ fun SplashScreen(navController: NavController) {
         delay(800)
 
         if (user != null) {
-            navController.navigate("role") {
-                popUpTo("splash") { inclusive = true }
-            }
+            navigateAfterAuth(navController, "splash")
         }
     }
 

@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.cti_cart.data.model.RFQ
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
@@ -34,6 +35,33 @@ object FirebaseRepository {
             .addOnFailureListener {
                 it.printStackTrace()
                 onResult("")
+            }
+    }
+
+
+    // -------------------- SAVE USER ROLE --------------------
+
+    fun saveUserRole(
+        role: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val user = auth.currentUser
+        if (user == null) {
+            onFailure(Exception("User not logged in"))
+            return
+        }
+
+        val data = mutableMapOf<String, Any>("role" to role)
+        user.email?.let { data["email"] = it }
+
+        firestore.collection("users")
+            .document(user.uid)
+            .set(data, SetOptions.merge())
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener {
+                it.printStackTrace()
+                onFailure(it)
             }
     }
 

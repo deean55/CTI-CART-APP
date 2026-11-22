@@ -1,6 +1,7 @@
 package com.example.cti_cart.ui.screens
 
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -10,14 +11,16 @@ import androidx.navigation.NavController
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.ui.unit.*
-import com.google.firebase.firestore.SetOptions
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.cti_cart.data.FirebaseRepository
+import com.example.cti_cart.model.User
 
 @Composable
 fun RoleSelectionScreen(navController: NavController) {
+
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -39,18 +42,14 @@ fun RoleSelectionScreen(navController: NavController) {
         RoleCard(
             title = "Machine Owner / Supplier",
             onClick = {
-                navController.navigate("supplier_dashboard") {
-                    popUpTo("role") { inclusive = true }
-                }
+                saveRoleAndNavigate(User.ROLE_SUPPLIER, navController, context)
             }
         )
 
         RoleCard(
             title = "Job Provider / Buyer",
             onClick = {
-                navController.navigate("buyer_dashboard") {
-                    popUpTo("role") { inclusive = true }
-                }
+                saveRoleAndNavigate(User.ROLE_BUYER, navController, context)
             }
         )
     }
@@ -84,25 +83,24 @@ fun RoleCard(title: String, onClick: () -> Unit) {
     }
 }
 
-fun saveRoleAndNavigate(role: String, navController: NavController) {
-
-    val user = FirebaseAuth.getInstance().currentUser ?: return
-
-    FirebaseFirestore.getInstance()
-        .collection("users")
-        .document(user.uid)
-        .set(
-            mapOf(
-                "role" to role,
-                "email" to user.email
-            ),SetOptions.merge()
-        )
-        .addOnSuccessListener {
-
-            navController.navigate("supplier_dashboard") {
+fun saveRoleAndNavigate(
+    role: String,
+    navController: NavController,
+    context: android.content.Context
+) {
+    FirebaseRepository.saveUserRole(
+        role = role,
+        onSuccess = {
+            navController.navigate(dashboardRouteForRole(role)) {
                 popUpTo("role") { inclusive = true }
             }
-
+        },
+        onFailure = { error ->
+            Toast.makeText(
+                context,
+                "Could not save role: ${error.message}",
+                Toast.LENGTH_LONG
+            ).show()
         }
+    )
 }
-

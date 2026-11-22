@@ -130,9 +130,7 @@ fun LoginScreen(navController: NavController) {
 
                         if (task.isSuccessful) {
 
-                            navController.navigate("role") {
-                                popUpTo("login") { inclusive = true }
-                            }
+                            navigateAfterAuth(navController, "login")
 
                         } else {
 
@@ -198,9 +196,7 @@ fun firebaseAuthWithGoogle(idToken: String, navController: NavController) {
                     Toast.LENGTH_SHORT
                 ).show()
 
-                navController.navigate("role") {
-                    popUpTo("login") { inclusive = true }
-                }
+                navigateAfterAuth(navController, "login")
 
             } else {
 

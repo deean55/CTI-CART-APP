@@ -219,7 +219,7 @@ fun RegisterScreen(navController: NavController) {
                             city = location,
                             latitude = latitude,
                             longitude = longitude,
-                            role = "customer"
+                            role = ""
                         )
 
                         FirebaseRepository.firestore.collection("users")

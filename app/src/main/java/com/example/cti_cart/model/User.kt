@@ -9,5 +9,10 @@ data class User(
     val city: String = "",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
-    val role: String = "customer"
-)
+    val role: String = ""
+) {
+    companion object {
+        const val ROLE_SUPPLIER = "supplier"
+        const val ROLE_BUYER = "buyer"
+    }
+}

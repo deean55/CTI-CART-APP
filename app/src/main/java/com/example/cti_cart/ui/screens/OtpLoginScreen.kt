@@ -411,14 +411,7 @@ fun signInWithPhoneCredential(
 
                 onSuccess()
 
-                navController.navigate("role") {
-
-                    popUpTo("otp") {
-                        inclusive = true
-                    }
-
-                    launchSingleTop = true
-                }
+                navigateAfterAuth(navController, "otp")
 
             } else {
 
